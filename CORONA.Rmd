@@ -65,12 +65,15 @@ ggplot(coverage, aes(x = year)) +
   geom_ribbon(aes(ymin = 0, ymax = num_extant_facilities, fill = "Extant Facilities"), alpha = 0.75) +
   geom_ribbon(aes(ymin = 0, ymax = num_spotted_facilities, fill = "Spotted Facilities"), alpha = 0.75) +
   scale_fill_manual(values = c("Extant Facilities" = "#7eb0d5", "Spotted Facilities" = "#fd7f6f")) +
-  labs(y = "Coverage") +
+  labs(y = "Coverage", 
+       x = "Year",
+       fill = "") +
   theme_minimal()
 ```
 
 
 ```{r}
+## CLIENT
 ui <- fluidPage(
   tags$style(type = "text/css", "
       .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar { }
@@ -78,12 +81,12 @@ ui <- fluidPage(
                                                   border-top: 1px solid red ;
                                                   border-bottom: 1px solid red ;}
       "),
-  titlePanel("Map with Time Slider"),
+  titlePanel("Coverage of Nuclear Facilities by the CORONA Recon Satellite Program"),
   sidebarLayout(
     sidebarPanel(
       checkboxInput("showUnknown","Show Facilities with Unknown Start Dates", value = FALSE),
       checkboxInput("showCaptures","Show Spotted Facilities", value = FALSE),
-      sliderInput("dateSlider", "Date:", 
+      sliderInput("dateSlider", "Adjust Date:", 
                   min = min_date, 
                   max = max_date, 
                   value = min_date, 
@@ -91,16 +94,15 @@ ui <- fluidPage(
                   animate = animationOptions(interval = 250))
     ),
     mainPanel(
-      leafletOutput("map", height = "600px", width = "900px"),
+      leafletOutput("map", height = "600px", width = "800px"),
       plotOutput("plot")
     )
   )
 )
 
-# add capture range slider, show captures checkbox
 
-# when "Show captures" checkbox is on:
-#   if a facility on the map (present in fac_filtered_by_dates) has a capture that occurred within the specified range of dates, turn the facility red
+
+## SERVER
 
 server <- function(input, output, session) {
   state <- reactiveValues(fac = fac_geodf)
@@ -161,20 +163,6 @@ server <- function(input, output, session) {
       )
     }
   }
-  
-  # create_plot <- function() {
-  #   # create coverage table based on captures & facilities DFs
-  #   
-  #   output$plot <- renderPlot({ 
-  #     coverage %>% ggplot(aes(x = year)) +
-  #       geom_ribbon(aes(ymin = 0, ymax = num_extant_facilities, fill = "Extant Facilities"), alpha = 0.75) +
-  #       geom_ribbon(aes(ymin = 0, ymax = num_spotted_facilities, fill = "Spotted Facilities"), alpha = 0.75) +
-  #       scale_fill_manual(values = c("Extant Facilities" = "#7eb0d5", "Spotted Facilities" = "#fd7f6f")) +
-  #       labs(y = "Coverage") +
-  #       theme_minimal()
-  #   })
-  #   
-  # }
    
   # run on startup. Adjust NAs and filter by date
   output$map <- renderLeaflet({
@@ -212,6 +200,23 @@ shinyApp(ui, server)
 
 
 
+```{r}
+# scratch:
+
+# create_plot <- function() {
+  #   # create coverage table based on captures & facilities DFs
+  #   
+  #   output$plot <- renderPlot({ 
+  #     coverage %>% ggplot(aes(x = year)) +
+  #       geom_ribbon(aes(ymin = 0, ymax = num_extant_facilities, fill = "Extant Facilities"), alpha = 0.75) +
+  #       geom_ribbon(aes(ymin = 0, ymax = num_spotted_facilities, fill = "Spotted Facilities"), alpha = 0.75) +
+  #       scale_fill_manual(values = c("Extant Facilities" = "#7eb0d5", "Spotted Facilities" = "#fd7f6f")) +
+  #       labs(y = "Coverage") +
+  #       theme_minimal()
+  #   })
+  #   
+  # }
+```
 
 
 ## ------------ RANGE SLIDER VERSION --------------- ##
