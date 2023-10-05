@@ -17,8 +17,8 @@ min_date = min(append(facs$start_date, missiles$start_date), na.rm = TRUE)
 max_date = max(append(facs$start_date, missiles$start_date), na.rm = TRUE)
 
 
-## CLIENT
 
+## CLIENT
 ui <- fluidPage(
   tags$style(type = "text/css", "
       .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar { }
@@ -47,7 +47,9 @@ ui <- fluidPage(
 
 
 
-## SERVER
+
+
+##SERVER
 
 server <- function(input, output, session) {
   state <- reactiveValues(fac = facs,
