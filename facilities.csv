@@ -1,2 +1,158 @@
 "","facility_name","country","country_code","coordinates","lat","lng","start_date"
-"1","Ezeiza – SF Reprocessing Facility","Argentina",160,"-34.854123.-58.522925",
+"1","Ezeiza – SF Reprocessing Facility","Argentina",160,"-34.854123.-58.522925","-34.854123","-58.522925",1968-01-01
+"2","Ezeiza II – SF Reprocessing Facility","Argentina",160,"-34.854123.-58.522925","-34.854123","-58.522925",1978-01-01
+"3","Pilcaniyeu Enrichment Facility I","Argentina",160,"-41.1226452.-70.7215709","-41.1226452","-70.7215709",1979-01-01
+"4","Lucas Heights","Australia",900,"-34.0506403.150.9872444","-34.0506403","150.9872444",1965-01-01
+"5","Silex Laser Enrichment Facility at Lucas Heights Science and Technology Complex","Australia",900,"38.63805199999999.-90.221913","38.63805199999999","-90.221913",1982-01-01
+"6","Mol, Purex Reprocessing Facility, Eurochemic","Belgium",211,"51.194551.5.119991","51.194551","5.119991",1960-01-01
+"7","Aerospace Technical Center (Institute of Advanced Studies)","Brazil",140,"-23.248269919363636. -45.85989846071746","-23.248269919363636"," -45.85989846071746",1975-01-01
+"8","BRN Enrichment (Aramar Isotopic Enrichment Lab) Ipero, Sao Paulo","Brazil",140,"-23.393281.-47.6047147","-23.393281","-47.6047147",1976-01-01
+"9","INB Resende –Pilot Enrichment Facility, Rio De Janeiro","Brazil",140,"-22.4722561.-44.4649211","-22.4722561","-44.4649211",1982-01-01
+"10","IPEN – Reprocessing","Brazil",140,"-23.562264469783784. -46.73962500234428","-23.562264469783784"," -46.73962500234428",1960-01-01
+"11","Pilot Enrichment Plant- Belo Horizonte (INB Resende)","Brazil",140,"-19.919052.-43.9386685","-19.919052","-43.9386685",1975-01-01
+"12","Chalk River Site","Canada",20,"46.0159102.-77.45227609999999","46.0159102","-77.45227609999999",1944-01-01
+"13","Montreal Lab","Canada",20,"45.5018869.-73.56739189999999","45.5018869","-73.56739189999999",1942-01-01
+"14","China Institute of Atomic Energy (Diffusion Lab)","China",710,"28.7208.115.821061","28.7208","115.821061",1955-01-01
+"15","China Institute of Atomic Energy (Radiochemistry Research Institute)","China",710,"28.7208.115.821062","28.7208","115.821062",NA
+"16","Plant 405 Pilot Centrifuge Plant, Hanzhong","China",710,"33.0676099.107.02377","33.0676099","107.02377",NA
+"17","Hanzhong, Shaanxi Uranium Enrichment Plant, Hanzhong II","China",710,"33.0676099.107.02377","33.0676099","107.02377",NA
+"18","Heping (located in Jinkouhe, Sichuan Province, Plant 814)","China",710,"29.24519.103.07845","29.24519","103.07845",NA
+"19","Juiquan Atomic Energy Complex (Plant 404)","China",710,"39.7325499.98.49394","39.7325499","98.49394",NA
+"20","Juiquan 2 (Atomic Energy Complex)","China",710,"39.7325499.98.49394","39.7325499","98.49394",1965-01-01
+"21","Nuclear Fuel Component Plant (Pant 812, Yibin Sichuan)","China",710,"28.7512999.104.6417","28.7512999","104.6417",1968-01-01
+"22","Lanzhou 1 (China Institute of Atomic Energy Tuoli, Plant 504)","China",710,"36.0613799.103.83417","36.0613799","103.83417",1958-01-01
+"23","Lanzhou 3 (Indigenous Centrifuge Plant II)","China",710,"36.050357.103.850246","36.050357","103.850246",NA
+"24","Plant 821 (Plutonium Production Complex in Guangyuan, Sichuan)","China",710,"32.4354899.105.84357","32.4354899","105.84357",1969-01-01
+"25","Nuclear Research Institute of Czechoslovakia, Rez","Czech Republic",315,"50.17773772546516. 14.358938898294321","50.17773772546516"," 14.358938898294321",NA
+"26","Hot Cell Facility at Inshas Nuclear Research Center","Egypt",651,"30.387053.31.4440355","30.387053","31.4440355",1980-01-01
+"27","Le Bouchet -- Lab-Scale Reprocessing Plant","France",220,"48.53337994177564. 2.36166","48.53337994177564"," 2.36166",NA
+"28","Areva NC La Hague – UP2 – 400 (renamed HAO facility in 1976)","France",220,"49.6639603.-1.8485699","49.6639603","-1.8485699",1961-01-01
+"29","Areva NC La Hague – UP2 – 800","France",220,"49.6639603.-1.8485699","49.6639603","-1.8485699",1982-01-01
+"30","Areva NC La Hague – UP3","France",220,"49.6639603.-1.8485699","49.6639603","-1.8485699",1982-01-01
+"31","Atelier Pilote","France",220,"43.5050506.5.733836","43.5050506","5.733836",NA
+"32","La Hague – AT1","France",220,"49.6639603.-1.8485699","49.6639603","-1.8485699",NA
+"33","La Hague (Marcoule-UP1)","France",220,"49.6639603.-1.8485699","49.6639603","-1.8485699",1952-01-01
+"34","ATTILA, (FONTENAY: ATTaque d’Irradiés-combustibles-en Lits d’Alumine)","France",220,"48.78970972878041. 2.286202820720732","48.78970972878041"," 2.286202820720732",1966-01-01
+"35","Plutonium Chemistry Laboratory (LCPu) -- Fontenay-aux-Roses","France",220,"48.789776.2.287181","48.789776","2.287181",NA
+"36","FONTENAY: BÂTIMENT RADIOCHIMIE (Building 18)","France",220,"48.789776.2.287182","48.789776","2.287182",1959-01-01
+"37","FONTENAY: BÂTIMENT PLUTONIUM (Building 19)","France",220,"48.789776.2.287183","48.789776","2.287183",NA
+"38","Fontenay Pilot Reprocessing Plant","France",220,"44.14627337596833. 4.70441761172913","44.14627337596833"," 4.70441761172913",1952-01-01
+"39","Eurodif (Georges Besse I)","France",220,"44.33015095.4.72085710509542","44.33015095","4.72085710509542",1974-01-01
+"40","PL81 Grenoble","France",220,"45.188529.5.724524","45.188529","5.724524",1968-01-01
+"41","PL4","France",220,"50.3735195.-4.1197593","50.3735195","-4.1197593",1984-01-01
+"42","Pierrelate GDP","France",220,"44.37775000000001.4.696981000000001","44.37775000000001","4.696981000000001",1960-01-01
+"43","Pierrelatte, Laser","France",220,"44.37775000000001.4.696981000000001","44.37775000000001","4.696981000000001",1984-01-01
+"44","PP35 Pierrelatte","France",220,"44.37775000000001.4.696981000000001","44.37775000000001","4.696981000000001",1968-01-01
+"45","Enrichment Technology Company Ltd. Zweigniederlassung Deutschland","Germany",260,"51.165691.10.451526","51.165691","10.451526",1960-01-01
+"46","Karlsruhe Nuclear Research Center, Institute for Nuclear Process Engineering","Germany",260,"49.0068901.8.4036527","49.0068901","8.4036527",1960-01-01
+"47","Karlsruhe Reprocessing Plant (WAK)","Germany",260,"49.0068901.8.4036527","49.0068901","8.4036527",1967-01-01
+"48","MILLI Reprocessing Test Facility","Germany",260,"49.09011800202879. 8.38227603148698","49.09011800202879"," 8.38227603148698",1965-01-01
+"49","Plutonium Test Extraction Facility (Reprocessing Plant Karlsruhe)","Germany",260,"49.0068901.8.4036527","49.0068901","8.4036527",1977-01-01
+"50","Urenco Germany GmbH, Gronau","Germany",260,"52.2121627.7.0755789","52.2121627","7.0755789",1982-01-01
+"51","Wackersdorf Reprocessing Plant","Germany",260,"49.316069.12.167032","49.316069","12.167032",1985-01-01
+"52","BARC, Trombay (Pilot)","India",750,"19.0222081.72.92686259999999","19.0222081","72.92686259999999",1980-01-01
+"53","Bhabha Atomic Research Center (at Trombay)","India",750,"19.0093414.72.8984317","19.0093414","72.8984317",1964-01-01
+"54","Center for Advanced Technology, Laser Enrichment Plant","India",750,"44.633911.-85.767344","44.633911","-85.767344",1984-01-01
+"55","Kalpakkam Reprocessing Plant (KARP) Laboratory","India",750,"12.5238119.80.15681339999999","12.5238119","80.15681339999999",NA
+"56","Power Reactor Fuel Reprocessing (PREFRE), Bhabha Atomic Research Centre","India",750,"19.018268.72.924778","19.018268","72.924778",1969-01-01
+"57","Tehran Nuclear Research Center (Reprocessing)","Iran",630,"35.7218583.51.3346954","35.7218583","51.3346954",1967-01-01
+"58","Plasma Physics Laboratories in Tehran (TNRC)","Iran",630,"35.7218583.51.3346954","35.7218583","51.3346954",NA
+"59","Al Tuwaitha Chemical Ion Enrichment Facility","Iraq",645,"33.21350418284557. 44.51789711102107","33.21350418284557"," 44.51789711102107",NA
+"60","Al Tuwaitha Laser","Iraq",645,"33.21350418284557. 44.51789711102107","33.21350418284557"," 44.51789711102107",1981-01-01
+"61","Al Tuwaitha Hot Cell","Iraq",645,"33.21350418284557. 44.51789711102107","33.21350418284557"," 44.51789711102107",1982-01-01
+"62","Al Tarmiya (north of Baghdad)","Iraq",645,"33.315241.44.3660671","33.315241","44.3660671",1982-01-01
+"63","Al Tuwaitha Gas Diffusion Facility","Iraq",645,"33.21350418284557. 44.51789711102107","33.21350418284557"," 44.51789711102107",NA
+"64","Negev Nuclear Research Center, Dimona Machon 8","Israel",666,"31.0013.35.1445","31.0013","35.1445",1958-01-01
+"65","Negev Nuclear Research Center, Dimona Machon 9","Israel",666,"31.0013.35.1445","31.0013","35.1445",1972-01-01
+"66","Negev Nuclear Research Center, Dimona Machon 2","Israel",666,"31.0013.35.1445","31.0013","35.1445",1957-01-01
+"67","Nahal Soreq","Israel",666,"31.85223408533552.34.95024892764607","31.85223408533552","34.95024892764607",NA
+"68","Eurex SFRE (MTR) at Saluggia in Vercelli","Italy",325,"45.2353908.8.0105832","45.2353908","8.0105832",1964-01-01
+"69","Eurex SFRE (Oxide) at Saluggia in Vercelli","Italy",325,"45.2353908.8.0105832","45.2353908","8.0105832",1976-01-01
+"70","Eurex SFRE (PU Nitrate Line) Saluggia in Vercelli","Italy",325,"45.2353908.8.0105832","45.2353908","8.0105832",1981-01-01
+"71","ITREC at Trisaia","Italy",325,"40.16549405231614. 16.637227584513067","40.16549405231614"," 16.637227584513067",1962-01-01
+"72","Asahi Uranium Enrichment Laboratory","Japan",740,"35.55337768928075. 139.7488723630607","35.55337768928075"," 139.7488723630607",1982-01-01
+"73","JAEA Ningyo – Toge Enrichment Demo. Plant (DOP)","Japan",740,"35.3137544.133.9305704","35.3137544","133.9305704",1985-01-01
+"74","JAEA Tokai Reprocessing Plant (Japan Nuclear Cycle Institute)","Japan",740,"36.4729507.140.5661634","36.4729507","140.5661634",1971-01-01
+"75","Ningyo – Toge Uranium Pilot Plant","Japan",740,"35.3137544.133.9305704","35.3137544","133.9305704",1978-01-01
+"76","Reprocessing Test Facility (JRTF)","Japan",740,"36.26345434395012. 140.54965809791076","36.26345434395012"," 140.54965809791076",1968-01-01
+"77","Tokai Test Facility","Japan",740,"36.4677129941714. 140.60685124788597","36.4677129941714"," 140.60685124788597",NA
+"78","Al Hashan Enrichment Facility","Libya",620,"32.86618152088601. 13.237703748968759","32.86618152088601"," 13.237703748968759",NA
+"79","Plutonium Separation Facility at Tajura Nuclear Research Center","Libya",620,"32.8279425.13.3818345","32.8279425","13.3818345",NA
+"80","Tajoura Enrichment Facility","Libya",620,"32.8279425.13.3818345","32.8279425","13.3818345",NA
+"81","Almelo SP1 (Dutch)","Netherlands",210,"52.3670267.6.668491899999999","52.3670267","6.668491899999999",1971-01-01
+"82","Almelo SP2 (German Plant adjacent to the Dutch one in Almelo)","Netherlands",210,"52.3670267.6.668491899999999","52.3670267","6.668491899999999",1971-01-01
+"83","Almelo SP3 Demonstration","Netherlands",210,"52.3670267.6.668491899999999","52.3670267","6.668491899999999",1974-01-01
+"84","Almelo SP4","Netherlands",210,"52.3670267.6.668491899999999","52.3670267","6.668491899999999",1979-01-01
+"85","Radio Chemical Laboratory (Yongbyon)","North Korea",731,"39.797407.125.7548637","39.797407","125.7548637",NA
+"86","Isotope Production Laboratory","North Korea",731,"39.7976130565985. 125.75486369799856","39.7976130565985"," 125.75486369799856",NA
+"87","Plutonium Laboratory at Kjeller","Norway",385,"59.9739757.11.0465607","59.9739757","11.0465607",NA
+"88","Kjeller Pilot Uranium Reprocessing Plant","Norway",385,"59.9739757.11.0465607","59.9739757","11.0465607",NA
+"89","Chaklala","Pakistan",770,"33.6030584.73.0936509","33.6030584","73.0936509",1974-01-01
+"90","Chashma Reprocessing Facility","Pakistan",770,"32.38783404745864. 71.46836036157238","32.38783404745864"," 71.46836036157238",1974-01-01
+"91","Kahuta- KRL (A.Q. Khan Research Laboratories)","Pakistan",770,"33.5896138.73.3885526","33.5896138","73.3885526",1974-01-01
+"92","Experimental Reprocessing Plant at Pakistan Institute of Nuclear Science and Technology (PINSTECH)","Pakistan",770,"33.65303430000001.73.2586063","33.65303430000001","73.2586063",1971-01-01
+"93","New Labs at PINSTECH","Pakistan",770,"33.653150380723396. 73.25856338251063","33.653150380723396"," 73.25856338251063",1980-01-01
+"94","Sihala","Pakistan",770,"33.5440724.73.19691080000001","33.5440724","73.19691080000001",1976-01-01
+"95","Pitesti Nuclear Research Institute","Romania",360,"44.8564798.24.8691824","44.8564798","24.8691824",1981-01-01
+"96","Angarsk ElectroChemical Combine, Diffusion","Russia",365,"52.5155702.103.91716","52.5155702","103.91716",1949-01-01
+"97","Angarsk ElectroChemical Combine, Centrifuge","Russia",365,"52.5155702.103.91716","52.5155702","103.91716",NA
+"98","Dneproetrovsk Physicochemical Institute","Russia",365,"48.464717.35.046183","48.464717","35.046183",1941-01-01
+"99","Institute A (near Sukhumi)","Russia",365,"43.0015252.41.0234153","43.0015252","41.0234153",NA
+"100","Institute G (near Sukhumi)","Russia",365,"43.0015252.41.0234153","43.0015252","41.0234153",1945-01-01
+"101","Krasnoyarsk-45 Electronchemical Plant - Diffusion (Zelenogorsk in Laughter)","Russia",365,"56.11014170000001.94.5105514","56.11014170000001","94.5105514",1949-01-01
+"102","Krasnoyarsk-45 Electronchemical Plant - Centrifuge (Zelenogorsk in Laughter)","Russia",365,"56.11014170000001.94.5105514","56.11014170000001","94.5105514",NA
+"103","Krasnoyarsk-26","Russia",365,"56.2602634.93.5356304","56.2602634","93.5356304",1950-01-01
+"104","Sverdlovsk Laboratory of Electric Phenomena","Russia",365,"56.8430993.60.64540859999999","56.8430993","60.64540859999999",1943-01-01
+"105","Laboratory No. 2, Moscow","Russia",365,"55.755826.37.6173","55.755826","37.6173",1943-01-01
+"106","Leningrad Compressor Plant","Russia",365,"59.9342596.30.3350941","59.9342596","30.3350941",1945-01-01
+"107","Gorky Machine Building Plant","Russia",365,"56.33362912398834. 43.89175526994961","56.33362912398834"," 43.89175526994961",1947-01-01
+"108","B Plant, Mayak (Chelyabinsk-65)","Russia",365,"55.7674306.60.69308710000001","55.7674306","60.69308710000001",1946-01-01
+"109","Pilot Centrifuge Plant, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",1955-01-01
+"110","Commercial Centrifuge Plant 1, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",1960-01-01
+"111","Commercial Centrifuge Plant 2, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",NA
+"112","Commercial Centrifuge Plant 3, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",NA
+"113","Commercial Centrifuge Plant 4, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",NA
+"114","Radium Institute","Russia",365,"60.00177681372037. 30.349107439104447","60.00177681372037"," 30.349107439104447",1942-01-01
+"115","RIAR (Research Institute of Atomic Reactors)","Russia",365,"54.187732.49.4759616","54.187732","49.4759616",1956-01-01
+"116","RT–1, Combined Mayak in Ozersk/Chelyabinsk-65","Russia",365,"55.7674306.60.69308710000001","55.7674306","60.69308710000001",1971-01-01
+"117","RT – 2","Russia",365,"42.5725316.-72.1553494","42.5725316","-72.1553494",1976-01-01
+"118","D1, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",1946-01-01
+"119","D3, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",1950-01-01
+"120","D4, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",1950-01-01
+"121","D5, Urals Electro-Chemical Combine, Novouralsk","Russia",365,"57.2485663.60.0888714","57.2485663","60.0888714",1950-01-01
+"122","Siberian Chemical Combine - Diffusion (Seversk formerly Tomsk-7)","Russia",365,"56.58911500000001.84.90131799999999","56.58911500000001","84.90131799999999",1949-01-01
+"123","Siberian Chemical Combine - Centrifuge (Seversk formerly Tomsk-7)","Russia",365,"56.58911500000001.84.90131799999999","56.58911500000001","84.90131799999999",1973-01-01
+"124","Siberian Chemical Combine (Seversk) II","Russia",365,"56.6026874.84.8805395","56.6026874","84.8805395",1949-01-01
+"125","Ukrainian Physicotechnical Institute in Khar’kov","Russia",365,"50.00413520000001.36.2281997","50.00413520000001","36.2281997",1941-01-01
+"126","SU-20, Plant 418","Russia",365,"58.638713910553385. 59.79028284818416","58.638713910553385"," 59.79028284818416",1946-01-01
+"127","S-2, Arzamas-16","Russia",365,"54.9342792.43.3252503","54.9342792","43.3252503",NA
+"128","Valindaba (Laser)","South Africa",560,"-25.79947023459287. 27.943314911056277","-25.79947023459287"," 27.943314911056277",1983-01-01
+"129","Valindaba Y – Plant","South Africa",560,"-25.79947023459287. 27.943314911056277","-25.79947023459287"," 27.943314911056277",1971-01-01
+"130","Valindaba Z – Plant","South Africa",560,"-25.79947023459287. 27.943314911056277","-25.79947023459287"," 27.943314911056277",NA
+"131","Laboratory Enrichment Facility at Pelindaba","South Africa",560,"-25.943447.27.908953","-25.943447","27.908953",1960-01-01
+"132","Hot Cell Complex, Pelindaba Nuclear Research Center","South Africa",560,"-25.943447.27.908954","-25.943447","27.908954",1984-01-01
+"133","KAERI (Laboratory for Quantum Optics at Korea Atomic Energy Research Institute)","South Korea",732,"36.4206333.127.375139","36.4206333","127.375139",NA
+"134","Hot Cell Facility, (KAERI Facility)","South Korea",732,"36.4206333.127.375140","36.4206333","127.375140",NA
+"135","Chemical Enrichment (KAERI)","South Korea",732,"36.4206333.127.375141","36.4206333","127.375141",NA
+"136","Juan Vigon Pilot Reprocessing Plant","Spain",230,"40.456267707782956. -3.7263792401671725","40.456267707782956"," -3.7263792401671725",NA
+"137","Stockholm Extraction Laboratory","Sweden",380,"59.32932349999999.18.0685808","59.32932349999999","18.0685808",1946-01-01
+"138","Studsvik Research Center","Sweden",380,"58.76956034928185. 17.383489125369064","58.76956034928185"," 17.383489125369064",NA
+"139","Institute for Nuclear Energy Reaction (INER) Reprocessing Facility I","Taiwan",713,"24.854969689990586. 121.25335454819705","24.854969689990586"," 121.25335454819705",1970-01-01
+"140","Institute for Nuclear Energy Reaction (INER) Reprocessing Facility II","Taiwan",713,"24.854969689990586. 121.25335454819705","24.854969689990586"," 121.25335454819705",1975-01-01
+"141","Capenhurst A-3","United Kingdom",200,"53.2612738.-2.9518011","53.2612738","-2.9518011",1982-01-01
+"142","Capenhurst (GD) (E-22)","United Kingdom",200,"53.257861.-2.949588","53.257861","-2.949588",1950-01-01
+"143","Capenhurst (Urenco)","United Kingdom",200,"53.2601269.-2.944619","53.2601269","-2.944619",NA
+"144","Capenhurst (E-21)","United Kingdom",200,"53.2612738.-2.9518011","53.2612738","-2.9518011",1976-01-01
+"145","Capenhurst (E-23)","United Kingdom",200,"53.2612738.-2.9518011","53.2612738","-2.9518011",NA
+"146","Dounreay Reprocessing Facility","United Kingdom",200,"58.57862299999999.-3.747688","58.57862299999999","-3.747688",1957-01-01
+"147","NDA B205 Magnox Reprocessing","United Kingdom",200,"54.421518564476926. -3.4986176193910974","54.421518564476926"," -3.4986176193910974",NA
+"148","NDA B205 Plutonium Operating Corridors","United Kingdom",200,"54.421518564476926. -3.4986176193910974","54.421518564476926"," -3.4986176193910974",NA
+"149","NDA B203 Pu Residues Recovery Plant at Sellafield","United Kingdom",200,"54.416653.-3.505638","54.416653","-3.505638",1951-01-01
+"150","B204 Reprocessing Plant at Sellafield","United Kingdom",200,"54.416653.-3.505638","54.416653","-3.505638",1947-01-01
+"151","NDA Reprocessing Plant MTR","United Kingdom",200,"51.66000512950828. -1.228263267290472","51.66000512950828"," -1.228263267290472",1952-01-01
+"152","NDA Thorp","United Kingdom",200,"54.415656058459966. -3.5017321880753305","54.415656058459966"," -3.5017321880753305",1985-01-01
+"153","MOX Demonstration Facility","United Kingdom",200,"54.425604.-3.500048","54.425604","-3.500048",NA
+"154","Vinca Reprocessing Center near Belgrade (Boris Kidric Institute of Nuclear Sciences)","Yugoslavia",345,"44.758497974697725. 20.598281709783674","44.758497974697725"," 20.598281709783674",1956-01-01
+"155","Vinca Electromagnetic Isotope Separator (Vinca Laboratory of Physical Chemistry)","Yugoslavia",345,"44.758497974697725. 20.598281709783675","44.758497974697725"," 20.598281709783675",1956-01-01
+"156","Rudjer Boskovic Institute","Yugoslavia",345,"45.8300113.15.9870591","45.8300113","15.9870591",1952-01-01
+"157","Jozef Stefan Institute near Ljubljana","Yugoslavia",345,"46.0428588.14.4875933","46.0428588","14.4875933",1949-01-01

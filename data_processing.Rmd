@@ -1,5 +1,5 @@
 ---
-title: "Data Processing"
+title: "Data Prerocessing"
 output: html_document
 date: "2023-09-25"
 ---
@@ -9,25 +9,54 @@ library(xlsx)
 library(tidyverse)
 ```
 
+# Scripts to clean up the original datasets supplied by Quido
+
+## clean up facilities dataset
 ```{r}
 # load original data
-missiles <- read.xlsx("Missiles_datageocoding_prep.xlsx", 1)
 facs <- read.xlsx("NL_geocoded_working.xlsx",1)
 
 # cleanup 
 facs <- facs %>% select(-NA.) # remove random column
 colnames(facs) <- c("country", "country_code", "facility_name", "coordinates", "start_date") # rename columns
+
 facs <- facs %>%
   mutate(coordinates = gsub(",", ".", coordinates)) %>% # fix inconsistency in coords
   filter(!is.na(coordinates)) # remove rows with no coords (why do these exist?)
 
+facs$start_date[facs$start_date == -99] <- NA # replace -99 (unknown start dates) with NA
+facs$start_date <- as.Date(paste(facs$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
+
 facs <- facs %>% 
-  mutate(lat = lapply(strsplit(coordinates, "[.]"), function(x) paste(x[1], x[2], sep = ".")),
-         lng = lapply(strsplit(coordinates, "[.]"), function(x) paste(x[3], x[4], sep = ".")))
+  mutate(lat = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[1], x[2], sep = "."))),
+         lng = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[3], x[4], sep = "."))))
 
 facs <- facs[, c("facility_name", "country", "country_code", "coordinates", "lat", "lng", "start_date")] # reorder columns
 
 write.csv(facs, "facilities.csv")
-
-# build parsimonious dataframes with the necessary facilities, capture occurrences to be fed into the visualization
 ```
+
+## clean up missiles dataset
+```{r}
+# load original data
+missiles <- read.xlsx("Missiles_datageocoding_prep.xlsx", 1)
+
+# cleanup
+colnames(missiles) <- c("address", "country", "coordinates", "address_found", "No.rd.", "W.h", "start_date","end_date","armament","RA_or_enclosure" ) # rename columns
+
+missiles <- missiles %>%
+  mutate(coordinates = gsub(",", ".", coordinates)) # fix inconsistency in coords
+
+missiles$start_date <- as.Date(paste(missiles$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
+missiles$end_date <- as.Date(paste(missiles$end_date, "-01-01 00:00:00", sep = ""))
+
+missiles <- missiles %>% 
+            mutate(lat = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[1], x[2], sep = "."))),
+                   lng = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[3], x[4], sep = "."))))
+
+missiles <- missiles[, c("facility_name", "country", "country_code", "coordinates", "lat", "lng", "start_date")] # reorder columns
+
+```
+
+
+

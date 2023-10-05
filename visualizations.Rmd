@@ -29,6 +29,19 @@ min_date = min(fac_geodf$start_date, na.rm = TRUE)
 max_date = max(fac_geodf$start_date, na.rm = TRUE)
 ```
 
+```{r}
+facilities <- read_csv("facilities.csv")[-1]
+captures <- read_csv("captures.csv")[-1]
+
+# filter the dataset to remove cases where the photo was taken before construction started
+captures <- captures %>% filter(start_date <= Acquisitio)
+
+# get date range
+min_date = min(fac_geodf$start_date, na.rm = TRUE)
+max_date = max(fac_geodf$start_date, na.rm = TRUE)
+```
+
+
 ## Build a DF Summarizing Coverage
 ```{r}
 coverage <- data.frame(year = integer(),
