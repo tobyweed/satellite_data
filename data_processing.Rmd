@@ -27,6 +27,7 @@ facs <- facs %>%
 facs$start_date[facs$start_date == -99] <- NA # replace -99 (unknown start dates) with NA
 facs$start_date <- as.Date(paste(facs$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
 
+# add lat and lng cols
 facs <- facs %>% 
   mutate(lat = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[1], x[2], sep = "."))),
          lng = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[3], x[4], sep = "."))))
@@ -50,13 +51,34 @@ missiles <- missiles %>%
 missiles$start_date <- as.Date(paste(missiles$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
 missiles$end_date <- as.Date(paste(missiles$end_date, "-01-01 00:00:00", sep = ""))
 
+missiles$coordinates[27] <- paste(missiles$coordinates[27],".0",sep = "") # add '.0' at the end of the 27th coord cuz it was misformatted
+
+# add lat and lng cols
 missiles <- missiles %>% 
             mutate(lat = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[1], x[2], sep = "."))),
                    lng = as.character(lapply(strsplit(coordinates, "[.]"), function(x) paste(x[3], x[4], sep = "."))))
 
-missiles <- missiles[, c("facility_name", "country", "country_code", "coordinates", "lat", "lng", "start_date")] # reorder columns
+missiles <- missiles[, c("address_found", "country", "coordinates", "lat", "lng", "start_date", "end_date", "address","No.rd.", "W.h","armament","RA_or_enclosure")] # reorder columns
 
+write.csv(missiles, "missiles.csv")
 ```
 
 
+## clean up captures dataset
+```{r}
+captures <- read_csv("captures.csv")[-1]
+
+# rename imptnt cols
+colnames(captures)[2] <- "country"
+colnames(captures)[3] <- "country_code"
+colnames(captures)[4] <- "facility_name"
+colnames(captures)[5] <- "coordinates"
+colnames(captures)[7] <- "lat"
+colnames(captures)[8] <- "lng"
+
+captures$start_date[captures$start_date == -99] <- NA # replace -99 (unknown start dates) with NA
+captures$start_date <- as.Date(paste(captures$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
+
+write.csv(captures, "captures.csv")
+```
 
