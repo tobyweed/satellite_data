@@ -3,24 +3,22 @@ library(shiny)
 library(shinyjs)
 library(leaflet)
 
-## ------ SETUP ------ 
-fac_geodf <- read_csv("fac_geodf.csv")[-1]
-captures <- read_csv("captures.csv")[-1]
 
-fac_geodf$start_date[fac_geodf$start_date == -99] <- NA # unknown start dates
-fac_geodf$start_date <- as.Date(paste(fac_geodf$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
-captures$start_date <- as.Date(paste(captures$start_date, "-01-01", sep = "")) # convert start date to Date object -- not necessary, already knows
+## SETUP 
+facs <- read_csv("facilities.csv")[-1]
+missiles <- read_csv("missiles.csv")[-1]
+captures <- read_csv("captures.csv")[-1]
 
 # filter the dataset to remove cases where the photo was taken before construction started
 captures <- captures %>% filter(start_date <= Acquisitio)
 
 # get date range
-min_date = min(fac_geodf$start_date, na.rm = TRUE)
-max_date = max(fac_geodf$start_date, na.rm = TRUE)
+min_date = min(append(facs$start_date, missiles$start_date), na.rm = TRUE)
+max_date = max(append(facs$start_date, missiles$start_date), na.rm = TRUE)
 
 
+## CLIENT
 
-## ------ CLIENT ------
 ui <- fluidPage(
   tags$style(type = "text/css", "
       .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar { }
@@ -49,14 +47,15 @@ ui <- fluidPage(
 
 
 
-## ------- SERVER ------
+## SERVER
 
 server <- function(input, output, session) {
-  state <- reactiveValues(fac = fac_geodf)
+  state <- reactiveValues(fac = facs,
+                          miss = missiles)
   
   # handle unknown dates
   adjust_nas <- function() {
-    state$fac <- fac_geodf
+    state$fac <- facs
     
     if(input$showUnknown) {
       state$fac$start_date <- replace(state$fac$start_date, is.na(state$fac$start_date), min_date) # replace NA values with the min slider date
@@ -65,15 +64,21 @@ server <- function(input, output, session) {
     }
   }
   
-  # filter by date range shown on slider
+  # filter facilities by date range shown on slider
   fac_filtered_by_dates <- function() {
     state$fac[state$fac$start_date <= input$dateSlider,]
+  }
+  
+  # filter missiles by date range shown on slider
+  miss_filtered_by_dates <- function() {
+    miss_not_expired <- ifelse(!is.na(state$miss$end_date), state$miss$end_date >= input$dateSlider, TRUE)
+    state$miss[(state$miss$start_date <= input$dateSlider) & miss_not_expired,]
   }
   
   # filter for facilities which have been captured bf date
   captured_facs <- function() {
     captures %>% filter(Acquisitio <= input$dateSlider) %>% # filter for captures bf current date
-      filter(original_facility_name %in% state$fac$original_facility_name) %>% # filter facs which aren't in current state (e.g. NA)
+      filter(facility_name %in% state$fac$facility_name) %>% # filter facs which aren't in current state (e.g. NA)
       group_by(fac_index) %>% # group by facility
       filter(Acquisitio == max(Acquisitio)) %>% # keep the most recent captures
       distinct(fac_index, .keep_all = TRUE) # make sure only one capture of each facility is present.
@@ -84,27 +89,38 @@ server <- function(input, output, session) {
     leafletProxy(mapId = 'map') %>%
       clearMarkers() %>%
       addCircleMarkers(data = fac_filtered_by_dates(),
-                       lng = ~Longitude, lat = ~Latitude,
+                       lng = ~lng, lat = ~lat,
                        radius = 5,
                        weight = 1,
                        color = "blue",
                        opacity = 1,
                        fillOpacity = 0.5,
-                       popup = ~paste("Name: ", original_facility_name, "<br>",
+                       popup = ~paste("Name: ", facility_name, "<br>",
                                       "Facility Start Date: ", start_date,
                                       ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
+      ) %>%
+      addMarkers(data = miss_filtered_by_dates(),
+                 lng = ~lng, lat = ~lat,
+                 icon = makeIcon(
+                   iconUrl = "img/plain-triangle.png",
+                   iconWidth = 10, iconHeight = 10,
+                   iconAnchorX = 10, iconAnchorY = 10
+                 ),
+                 popup = ~paste("Missile Site",
+                                "<br>Start Date: ", start_date,
+                                ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
       )
     
     if (input$showCaptures) {
       leafletProxy(mapId = 'map') %>%
         addCircleMarkers(data = captured_facs(),
-                         lng = ~Longitude, lat = ~Latitude,
+                         lng = ~lng, lat = ~lat,
                          radius = 5,
                          weight = 1,
                          color = "red",
                          opacity = 1,
                          fillOpacity = 0.7,
-                         popup = ~paste("Name: ", original_facility_name, "<br>",
+                         popup = ~paste("Name: ", facility_name, "<br>",
                                         "Facility Start Date: ", start_date, "<br>",
                                         "Most Recently Photographed: ", Acquisitio),
         )

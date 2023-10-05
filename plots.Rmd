@@ -12,33 +12,18 @@ library(shinyjs)
 library(leaflet)
 ```
 
-## Some Minor Data Adjustments
-# ```{r}
-# facs <- read_csv("facs.csv")[-1]
-# captures <- read_csv("captures.csv")[-1]
-# 
-# facs$start_date[facs$start_date == -99] <- NA # unknown start dates
-# facs$start_date <- as.Date(paste(facs$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
-# captures$start_date <- as.Date(paste(captures$start_date, "-01-01", sep = "")) # convert start date to Date object -- not necessary, already knows
-# 
-# # filter the dataset to remove cases where the photo was taken before construction started
-# captures <- captures %>% filter(start_date <= Acquisitio)
-# 
-# # get date range
-# min_date = min(facs$start_date, na.rm = TRUE)
-# max_date = max(facs$start_date, na.rm = TRUE)
-# ```
-
-```{r}
+# load data
+```{r, include=FALSE}
 facs <- read_csv("facilities.csv")[-1]
+missiles <- read_csv("missiles.csv")[-1]
 captures <- read_csv("captures.csv")[-1]
 
 # filter the dataset to remove cases where the photo was taken before construction started
 captures <- captures %>% filter(start_date <= Acquisitio)
 
 # get date range
-min_date = min(facs$start_date, na.rm = TRUE)
-max_date = max(facs$start_date, na.rm = TRUE)
+min_date = min(append(facs$start_date, missiles$start_date), na.rm = TRUE)
+max_date = max(append(facs$start_date, missiles$start_date), na.rm = TRUE)
 ```
 
 
@@ -85,6 +70,7 @@ ggplot(coverage, aes(x = year)) +
   theme_minimal()
 ```
 
+
 ## Map App
 ```{r}
 
@@ -121,7 +107,8 @@ ui <- fluidPage(
 ## SERVER
 
 server <- function(input, output, session) {
-  state <- reactiveValues(fac = facs)
+  state <- reactiveValues(fac = facs,
+                          miss = missiles)
   
   # handle unknown dates
   adjust_nas <- function() {
@@ -134,9 +121,15 @@ server <- function(input, output, session) {
     }
   }
   
-  # filter by date range shown on slider
+  # filter facilities by date range shown on slider
   fac_filtered_by_dates <- function() {
     state$fac[state$fac$start_date <= input$dateSlider,]
+  }
+  
+  # filter missiles by date range shown on slider
+  miss_filtered_by_dates <- function() {
+    miss_not_expired <- ifelse(!is.na(state$miss$end_date), state$miss$end_date >= input$dateSlider, TRUE)
+    state$miss[(state$miss$start_date <= input$dateSlider) & miss_not_expired,]
   }
   
   # filter for facilities which have been captured bf date
@@ -161,6 +154,17 @@ server <- function(input, output, session) {
         fillOpacity = 0.5,
         popup = ~paste("Name: ", facility_name, "<br>",
                    "Facility Start Date: ", start_date,
+                   ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
+      ) %>%
+      addMarkers(data = miss_filtered_by_dates(),
+        lng = ~lng, lat = ~lat,
+        icon = makeIcon(
+              iconUrl = "img/plain-triangle.png",
+              iconWidth = 10, iconHeight = 10,
+              iconAnchorX = 10, iconAnchorY = 10
+            ),
+        popup = ~paste("Missile Site",
+                   "<br>Start Date: ", start_date,
                    ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
       )
     
