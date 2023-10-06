@@ -112,18 +112,29 @@ length(unique(captures1$facility_name))
 
 ```
 
+```{r}
+captures_geom <- read_csv("captures_geom.csv")[-1]
+```
+
 
 ```{r}
-polygons <- not_present$geometry.1[1:100]
-points <- not_present$geometry[1:100]
+# polygons1 <- not_present$geometry.1[1:100]
+# points <- not_present$geometry[1:100]
+sf_poly <- st_as_sf(head(captures_geom,74), wkt = "geometry_copy", na.fail = FALSE)
+sf_points <- st_as_sf(captures_geom, wkt = "geometry")
+
+polygons <- sf_poly$geometry_copy[1:100]
+points <- sf_points$geometry
 
 map <- leaflet() %>%
   addTiles() %>%
-  addPolygons(data = polygons[15], fillColor = "transparent", color = "blue") %>%
-  addCircleMarkers(data = points[15])
+  addPolygons(data = polygons[50], fillColor = "transparent", color = "blue") %>%
+  addCircleMarkers(data = points[50])
 
 map
 ```
+
+
 
 
 
