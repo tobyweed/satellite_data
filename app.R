@@ -7,10 +7,9 @@ library(leaflet)
 ## SETUP 
 facs <- read_csv("facilities.csv")[-1]
 missiles <- read_csv("missiles.csv")[-1]
-captures <- read_csv("captures.csv")[-1]
-
-# filter the dataset to remove cases where the photo was taken before construction started
-captures <- captures %>% filter(start_date <= Acquisitio)
+# captures <- read_csv("captures.csv")[-1]
+fac_caps <- read_csv("fac_captures.csv")[-1]
+miss_caps <- read_csv("miss_captures.csv")[-1]
 
 # get date range
 min_date = min(append(facs$start_date, missiles$start_date), na.rm = TRUE)
@@ -79,11 +78,19 @@ server <- function(input, output, session) {
   
   # filter for facilities which have been captured bf date
   captured_facs <- function() {
-    captures %>% filter(Acquisitio <= input$dateSlider) %>% # filter for captures bf current date
+    fac_caps %>% filter(Acquisitio <= input$dateSlider) %>% # filter for fac_caps bf current date
       filter(facility_name %in% state$fac$facility_name) %>% # filter facs which aren't in current state (e.g. NA)
-      group_by(fac_index) %>% # group by facility
-      filter(Acquisitio == max(Acquisitio)) %>% # keep the most recent captures
-      distinct(fac_index, .keep_all = TRUE) # make sure only one capture of each facility is present.
+      group_by(facility_name) %>% # group by facility
+      filter(Acquisitio == max(Acquisitio)) %>% # keep the most recent fac_caps
+      distinct(facility_name, .keep_all = TRUE) # make sure only one capture of each facility is present.
+  }
+  
+  # filter for missiles which have been captured
+  captured_miss <- function() {
+    miss_caps %>% filter(Acquisitio <= input$dateSlider) %>% # filter for miss_caps bf current date
+      group_by(address_found) %>% # group by facility
+      filter(Acquisitio == max(Acquisitio)) %>% # keep the most recent fac_caps
+      distinct(address_found, .keep_all = TRUE) # make sure only one capture of each facility is present.
   }
   
   # add markers where there should be markers
@@ -101,13 +108,20 @@ server <- function(input, output, session) {
                                       "Facility Start Date: ", start_date,
                                       ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
       ) %>%
-      addMarkers(data = miss_filtered_by_dates(),
-                 lng = ~lng, lat = ~lat,
-                 icon = makeIcon(
-                   iconUrl = "img/plain-triangle.png",
-                   iconWidth = 10, iconHeight = 10,
-                   iconAnchorX = 10, iconAnchorY = 10
-                 ),
+      # addMarkers(data = miss_filtered_by_dates(),
+      #            lng = ~lng, lat = ~lat,
+      #            icon = makeIcon(
+      #              iconUrl = "img/plain-triangle.png",
+      #              iconWidth = 10, iconHeight = 10,
+      #              iconAnchorX = 10, iconAnchorY = 10
+      #            ),
+      addCircleMarkers(data = miss_filtered_by_dates(),
+                       lng = ~lng, lat = ~lat,
+                       radius = 5,
+                       weight = 1,
+                       color = "yellow",
+                       opacity = 1,
+                       fillOpacity = 0.5,
                  popup = ~paste("Missile Site",
                                 "<br>Start Date: ", start_date,
                                 ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
@@ -124,6 +138,17 @@ server <- function(input, output, session) {
                          fillOpacity = 0.7,
                          popup = ~paste("Name: ", facility_name, "<br>",
                                         "Facility Start Date: ", start_date, "<br>",
+                                        "Most Recently Photographed: ", Acquisitio),
+        ) %>%
+        addCircleMarkers(data = captured_miss(),
+                         lng = ~lng, lat = ~lat,
+                         radius = 5,
+                         weight = 1,
+                         color = "purple",
+                         opacity = 1,
+                         fillOpacity = 0.7,
+                         popup = ~paste("Missile Site",
+                                        "<br>Start Date: ", start_date,"<br>",
                                         "Most Recently Photographed: ", Acquisitio),
         )
     }
