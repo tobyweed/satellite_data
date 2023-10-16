@@ -4,6 +4,8 @@ output: html_document
 date: "2023-09-13"
 ---
 
+## This document is deprecated as of 10/16/23. Awaiting removal.
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
