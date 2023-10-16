@@ -1,0 +1,42 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-10-13"
+---
+
+```{r}
+library(sf)
+library(tidyverse)
+library(leaflet)
+```
+
+```{r}
+corona_coverage <- st_read("./corona2/corona2.shp")
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = corona_coverage)
+
+map
+```
+
+```{r}
+declass2_coverage <- st_read("./declassified2/declassii.shp")
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = declass2_coverage)
+
+map
+```
+
+```{r}
+declass3_coverage <- st_read("./declassiii/declassiii.shp")
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = declass3_coverage)
+
+map
+```
+

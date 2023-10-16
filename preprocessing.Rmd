@@ -9,6 +9,13 @@ library(xlsx)
 library(tidyverse)
 ```
 
+
+```{r}
+getwd()
+sat3 <- read_csv("declassified3.csv") # need to clean up coords n shit
+```
+
+
 # Scripts to clean up the original datasets supplied by Quido
 
 ## clean up facilities dataset

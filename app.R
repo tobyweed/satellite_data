@@ -25,11 +25,11 @@ ui <- fluidPage(
                                                   border-top: 1px solid red ;
                                                   border-bottom: 1px solid red ;}
       "),
-  titlePanel("Coverage of Nuclear Facilities by the CORONA Recon Satellite Program"),
+  titlePanel("Coverage of Nuclear Targets by the CORONA Recon Satellite Program"),
   sidebarLayout(
     sidebarPanel(
       checkboxInput("showUnknown","Show Facilities with Unknown Start Dates", value = FALSE),
-      checkboxInput("showCaptures","Show Spotted Facilities", value = FALSE),
+      checkboxInput("showCaptures","Show Spotted Facilities and Missiles", value = FALSE),
       sliderInput("dateSlider", "Adjust Date:", 
                   min = min_date, 
                   max = max_date, 

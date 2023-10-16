@@ -5,7 +5,7 @@ account: tobyweed
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9938443
-bundleId:
+bundleId: 7773098
 url: https://tobyweed.shinyapps.io/CORONA/
 version: 1
 asMultiple: FALSE
