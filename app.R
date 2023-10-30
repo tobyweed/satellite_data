@@ -7,7 +7,6 @@ library(leaflet)
 ## SETUP 
 facs <- read_csv("facilities.csv")[-1]
 missiles <- read_csv("missiles.csv")[-1]
-# captures <- read_csv("captures.csv")[-1]
 fac_caps <- read_csv("fac_captures.csv")[-1]
 miss_caps <- read_csv("miss_captures.csv")[-1]
 
