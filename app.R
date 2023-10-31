@@ -18,13 +18,20 @@ max_date = max(append(facs$start_date, missiles$start_date), na.rm = TRUE)
 
 ## CLIENT
 ui <- fluidPage(
+  # custom styling
   tags$style(type = "text/css", "
-      .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar { }
-      .js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-bar, .js-irs-1 .irs-from, .js-irs-1 .irs-to {background: red;
-                                                  border-top: 1px solid red ;
-                                                  border-bottom: 1px solid red ;}
+        .js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-bar { }
+        .js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-bar, .js-irs-1 .irs-from, .js-irs-1 .irs-to {background: red;
+                                                    border-top: 1px solid red ;
+                                                    border-bottom: 1px solid red ;}
+        .subtitle { padding-left: 15px; 
+                    color: #808080; }
       "),
-  titlePanel("Coverage of Nuclear Targets by the CORONA Recon Satellite Program"),
+  titlePanel("ReconView"),
+  fluidRow(
+    h3("Explore U.S. Satellite Reconnaissance of Nuclear Targets, 1941-1985", class = "subtitle"),
+    br()
+  ),
   sidebarLayout(
     sidebarPanel(
       checkboxInput("showUnknown","Show Facilities with Unknown Start Dates", value = FALSE),
@@ -92,26 +99,54 @@ server <- function(input, output, session) {
       distinct(address_found, .keep_all = TRUE) # make sure only one capture of each facility is present.
   }
   
-  get_pic_URL <- function(declass_n, mission, direc_flag, cam_type, disp_ID) {
-    # declass1
-    url <- "broken link"
-    # https://ims.cr.usgs.gov/browse/DIT/1117-2/086D/A/DS1117-2086DA001.jpg
-    # https://ims.cr.usgs.gov/browse/DIT/Mission/`Direction Flag`/`Camera Type`(V/F/A)/`Display ID`.jpg
-    print (disp_ID)
-    # if (declass_n == "declass1") {
+  # return a vector of popup windows for captured facilities or missiles
+  get_popups <- function(caps, is_facs){
+    popups <- c()
     
-      cam_letter <- recode(cam_type,
-                           "Vertical" = "V",
-                           "Aft" = "A",
-                           "Cartographic" = "C",
-                           "Forward" = "F"
-      )
-      
-      url <- paste("https://ims.cr.usgs.gov/browse/DIT/", mission, "/", direc_flag, "/", cam_letter,"/", disp_ID, ".jpg", sep = "")
-    # }
+    # fill in fields of popup windows for markers
+    if(length(caps) >= 1){
+      for (i in 1:nrow(caps)) {
+        # convert Camera Type field
+        cam_letter <- recode(caps$`Camera Type`[i],
+                             "Vertical" = "V",
+                             "Aft" = "A",
+                             "Cartographic" = "C",
+                             "Forward" = "F"
+        )
+        
+        # build URL
+        pic_url <- ""
+        
+        if(caps$`Data Source`[i] == "declass1") {
+          # pic_url <- paste("https://ims.cr.usgs.gov/browse/DIT/", 
+          #                  caps$Mission[i], "/", 
+          #                  caps$`Direction Flag`[i], "/", 
+          #                  cam_letter, "/",
+          #                  caps$`Display ID`[i], ".jpg", sep = "")
+          pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839febdccb64b3/",
+                           caps$`Display ID`[i], sep = "")
+          
+          #5e839febdccb64b3? 
+        } else if(caps$`Data Source`[i] == "declass2") {
+          pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839ff7d71d4811/",
+                           caps$`Display ID`[i], sep = "")
+        } else if(caps$`Data Source`[i] == "declass3") {
+          pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e7c41f3ffaaf662/",
+                           caps$`Display ID`[i], sep = "")
+        }
+        
+        popup <- paste(ifelse(is_facs, paste(caps$facility_name[i], "<br>"), "Missile Site"),
+                       "Start Date: ", caps$start_date[i], "<br>",
+                       "Most Recently Photographed: ", caps$`Acquisition Date`[i], "<br>",
+                       a("Click to See Image and Metadata", href = pic_url, target="_blank" ))
+        
+        popups <- c(popups, popup)
+      }
+    }
     
-    url
+    popups
   }
+  
   
   # add markers where there should be markers
   create_markers <- function() {
@@ -148,59 +183,35 @@ server <- function(input, output, session) {
       )
     
     if (input$showCaptures) {
+      fac_caps <- captured_facs()
+      fac_lngs <- fac_caps$lng
+      fac_lats <- fac_caps$lat
+      fac_popups <- get_popups(caps = fac_caps, is_facs = TRUE)
       
-      cap_facs <- captured_facs()
-      lngs <- cap_facs$lng
-      lats <- cap_facs$lat
-      popups <- c()
+      miss_caps <- captured_miss()
+      miss_lngs <- miss_caps$lng
+      miss_lats <- miss_caps$lat
+      miss_popups <- get_popups(caps = miss_caps, is_facs = FALSE)
       
-      # fill in fields of popup windows for markers
-      if(length(cap_facs) >= 1){
-        for (i in 1:length(cap_facs)) {
-          # convert Camera Type field
-          cam_letter <- recode(cap_facs$`Camera Type`[i],
-                              "Vertical" = "V",
-                              "Aft" = "A",
-                              "Cartographic" = "C",
-                              "Forward" = "F"
-          )
-          
-          # build URL
-          pic_url <- paste("https://ims.cr.usgs.gov/browse/DIT/", 
-                           cap_facs$Mission[i], "/", 
-                           cap_facs$`Direction Flag`[i], "/", 
-                           cam_letter, "/",
-                           cap_facs$`Display ID`[i], ".jpg", sep = "")
-          
-          popup <- paste(cap_facs$facility_name[i], "<br>",
-                         "Facility Start Date: ", cap_facs$start_date[i], "<br>",
-                         "Most Recently Photographed: ", cap_facs$`Acquisition Date`[i], "<br>",
-                         a("Click to See Photo", href = pic_url, target="_blank" ))
-          
-          popups <- c(popups, popup)
-        }
-      }
       
       leafletProxy(mapId = 'map') %>%
-        addCircleMarkers(data = cap_facs,
-                         lng = lngs, lat = lats,
+        addCircleMarkers(data = fac_caps,
+                         lng = fac_lngs, lat = fac_lats,
                          radius = 5,
                          weight = 1,
                          color = "red",
                          opacity = 1,
                          fillOpacity = 0.7,
-                         popup = popups
+                         popup = fac_popups
         ) %>%
-        addCircleMarkers(data = captured_miss(),
-                         lng = ~lng, lat = ~lat,
+        addCircleMarkers(data = miss_caps,
+                         lng = miss_lngs, lat = miss_lats,
                          radius = 5,
                          weight = 1,
                          color = "purple",
                          opacity = 1,
                          fillOpacity = 0.7,
-                         popup = ~paste("Missile Site",
-                                        "<br>Start Date: ", start_date,"<br>",
-                                        "Most Recently Photographed: ", `Acquisition Date`),
+                         popup = miss_popups,
         )
     }
   }

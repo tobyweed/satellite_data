@@ -1,5 +1,6 @@
 declassified*
 sat.csv
 sat*.csv
+*.csv
 .DS_Store
 .Rproj.user
