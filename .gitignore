@@ -4,3 +4,4 @@ sat*.csv
 *.csv
 .DS_Store
 .Rproj.user
+.RData

@@ -1,8 +1,8 @@
+
 library(tidyverse)
 library(shiny)
 library(shinyjs)
 library(leaflet)
-
 
 ## SETUP 
 facs <- read_csv("facilities.csv")[-1]
@@ -27,9 +27,9 @@ ui <- fluidPage(
         .subtitle { padding-left: 15px; 
                     color: #808080; }
       "),
-  titlePanel("ReconView"),
+  titlePanel("Nuclear Recon Explorer"),
   fluidRow(
-    h3("Explore U.S. Satellite Reconnaissance of Nuclear Targets, 1941-1985", class = "subtitle"),
+    h3("Explore U.S. Satellite Reconnaissance of Nuclear Targets from 1941-1985", class = "subtitle"),
     br()
   ),
   sidebarLayout(
@@ -40,8 +40,8 @@ ui <- fluidPage(
                   min = min_date, 
                   max = max_date, 
                   value = min_date, 
-                  step = 49,
-                  animate = animationOptions(interval = 250))
+                  step = 49)
+                  # animate = animationOptions(interval = 250))
     ),
     mainPanel(
       leafletOutput("map", height = "600px", width = "800px"),
@@ -104,7 +104,7 @@ server <- function(input, output, session) {
     popups <- c()
     
     # fill in fields of popup windows for markers
-    if(length(caps) >= 1){
+    if(nrow(caps) >= 1){
       for (i in 1:nrow(caps)) {
         # convert Camera Type field
         cam_letter <- recode(caps$`Camera Type`[i],
@@ -135,7 +135,7 @@ server <- function(input, output, session) {
                            caps$`Display ID`[i], sep = "")
         }
         
-        popup <- paste(ifelse(is_facs, paste(caps$facility_name[i], "<br>"), "Missile Site"),
+        popup <- paste(ifelse(is_facs, paste(caps$facility_name[i], "<br>"), "Missile Site <br>"),
                        "Start Date: ", caps$start_date[i], "<br>",
                        "Most Recently Photographed: ", caps$`Acquisition Date`[i], "<br>",
                        a("Click to See Image and Metadata", href = pic_url, target="_blank" ))
@@ -154,33 +154,34 @@ server <- function(input, output, session) {
       clearMarkers() %>%
       addCircleMarkers(data = fac_filtered_by_dates(),
                        lng = ~lng, lat = ~lat,
-                       radius = 5,
+                       radius = 2.8,
                        weight = 1,
-                       color = "blue",
+                       color = "#2a297b",
                        opacity = 1,
-                       fillOpacity = 0.5,
+                       fillOpacity = 1,
                        popup = ~paste(facility_name, "<br>",
                                       "Facility Start Date: ", start_date,
                                       ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
       ) %>%
-      # addMarkers(data = miss_filtered_by_dates(),
-      #            lng = ~lng, lat = ~lat,
-      #            icon = makeIcon(
-      #              iconUrl = "img/plain-triangle.png",
-      #              iconWidth = 10, iconHeight = 10,
-      #              iconAnchorX = 10, iconAnchorY = 10
-      #            ),
-      addCircleMarkers(data = miss_filtered_by_dates(),
-                       lng = ~lng, lat = ~lat,
-                       radius = 5,
-                       weight = 1,
-                       color = "yellow",
-                       opacity = 1,
-                       fillOpacity = 0.5,
+      addMarkers(data = miss_filtered_by_dates(),
+                 lng = ~lng, lat = ~lat,
+                 icon = makeIcon(
+                   iconUrl = "img/tri_#2a297b.png",
+                   iconWidth = 7.5, iconHeight = 7.5
+                 ),
                  popup = ~paste("Missile Site",
                                 "<br>Start Date: ", start_date,
-                                ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
-      )
+                                ifelse(input$showCaptures, "<br>Not Yet Photographed", "")))
+      # addCircleMarkers(data = miss_filtered_by_dates(),
+      #                  lng = ~lng, lat = ~lat,
+      #                  radius = 5,
+      #                  weight = 1,
+      #                  color = "yellow",
+      #                  opacity = 1,
+      #                  fillOpacity = 0.5,
+      #                  popup = ~paste("Missile Site",
+      #                                 "<br>Start Date: ", start_date,
+      #                                 ifelse(input$showCaptures, "<br>Not Yet Photographed", "")))
     
     if (input$showCaptures) {
       fac_caps <- captured_facs()
@@ -197,21 +198,29 @@ server <- function(input, output, session) {
       leafletProxy(mapId = 'map') %>%
         addCircleMarkers(data = fac_caps,
                          lng = fac_lngs, lat = fac_lats,
-                         radius = 5,
+                         radius = 2.8,
                          weight = 1,
-                         color = "red",
+                         color = "#dd2119",
                          opacity = 1,
-                         fillOpacity = 0.7,
+                         fillOpacity = 1,
                          popup = fac_popups
         ) %>%
-        addCircleMarkers(data = miss_caps,
+        # addCircleMarkers(data = fac_caps,
+        #                  lng = fac_lngs, lat = fac_lats,
+        #                  radius = 2.8,
+        #                  weight = 1,
+        #                  color = "#dd2119",
+        #                  opacity = 1,
+        #                  fillOpacity = 1,
+        #                  popup = miss_popups
+        # )
+        addMarkers(data = miss_caps,
                          lng = miss_lngs, lat = miss_lats,
-                         radius = 5,
-                         weight = 1,
-                         color = "purple",
-                         opacity = 1,
-                         fillOpacity = 0.7,
-                         popup = miss_popups,
+                         icon = makeIcon(
+                           iconUrl = "img/tri_#dd2119.png",
+                           iconWidth = 7.5, iconHeight = 7.5
+                         ),
+                         popup = miss_popups
         )
     }
   }

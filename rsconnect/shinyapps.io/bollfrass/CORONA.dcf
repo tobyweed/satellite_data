@@ -1,0 +1,12 @@
+name: CORONA
+title: CORONA
+username: bollfrass
+account: bollfrass
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 10512579
+bundleId: 7923015
+url: https://bollfrass.shinyapps.io/CORONA/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

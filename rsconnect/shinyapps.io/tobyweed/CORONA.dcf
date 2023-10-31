@@ -5,13 +5,9 @@ account: tobyweed
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 9938443
-<<<<<<< HEAD
-bundleId: 7773098
-=======
-bundleId: 7773079
->>>>>>> 3750d0f2f45282ed11842af676579a8fe0451095
+bundleId: 7879712
 url: https://tobyweed.shinyapps.io/CORONA/
 version: 1
 asMultiple: FALSE
 asStatic: FALSE
-ignoredFiles: declassified1.zip|declassified2.zip|sat.csv
+ignoredFiles: captures.Rmd|CORONA.html|CORONA.ipynb|plots.Rmd|preprocessing.Rmd|previous_work_inspection.Rmd|sat.csv|sat1.csv|sat2.csv|sat3.csv
