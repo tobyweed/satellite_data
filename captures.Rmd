@@ -19,55 +19,7 @@ missiles <- read_csv("missiles.csv")[-1]
 sat <- read_csv("sat.csv")[-1] # satellite photo polygons
 ```
 
-```{r}
-# need to clean up coords n shit
-sat1 <- read_csv("sat1.csv")
-sat2 <- read_csv("sat2.csv")
-sat3 <- read_csv("sat3.csv")
 
-# fix column inconsistencies
-setdiff(colnames(sat2), colnames(sat1))
-sat1$`Segment Count` <- rep(NA, nrow(sat1))
-sat1$`Operations Number` <- rep(NA, nrow(sat1))
-colnames(sat1)[colnames(sat1) == "NW Cormer Lat dec"] <- "NW Corner Lat dec"
-sat1$`Data Source` <- rep("declass1", nrow(sat1))
-
-setdiff(colnames(sat1), colnames(sat2))
-sat2$`Direction Flag` <- rep(NA, nrow(sat2))
-sat2$`Data Source` <- rep("declass2", nrow(sat2))
-
-# reformat Display ID for sat1, sat2 due to bad formatting in CSV provided by USGS
-reformat_id <- function(id, n) {
-  id <- strsplit(id, ",")[[1]][1] # split by comma, take first item
-  id
-  # this code inserted a "-", but I don't think that is actually necessary:
-  # # after the right n of characters insert "-"
-  # new_id <- paste(substr(id, 1, n), "-", substr(id, n+1, nchar(id)), sep = "")
-  # new_id
-}
-
-sat1$`Display ID` <- lapply(sat1$`Display ID`, reformat_id, n = 6)
-sat2$`Display ID` <- lapply(sat2$`Display ID`, reformat_id, n = 7)
-
-sat1_2 <- rbind(sat1,sat2)
-
-setdiff(colnames(sat1_2), colnames(sat3))
-sat3 <- sat3 %>% 
-  mutate(`Camera Type` = str_replace(Camera, "A", "High Resolution Surveillance Camera - Aft")) %>%
-  mutate(`Camera Type` = str_replace(`Camera Type`, "F", "High Resolution Surveillance Camera - Forward")) %>%
-  mutate(`Camera Type` = str_replace(`Camera Type`, "T", "Lower Resolution Terrain Mapping Camera")) %>%
-  select(-Camera)
-
-colnames(sat1_2)[colnames(sat1_2) == "Frame"] <- "Frame Number"
-colnames(sat1_2)[colnames(sat1) == "Down Load Available"] <- "Download Available"
-sat3$`Direction Flag` <- rep(NA, nrow(sat3))
-sat3$`Segment Count` <- rep(NA, nrow(sat3))
-sat3$`Data Source` <- rep("declass3", nrow(sat3))
-
-sat <- rbind(sat1_2, sat3)
-
-write_csv(sat, "sat.csv")
-```
 
 
 ```{r}
@@ -89,11 +41,14 @@ fac_captures$polygon_geometry <- st_as_text(fac_captures$polygon_geometry)
 
 # filter the dataset to remove cases where the photo was taken before construction started
 fac_captures <- fac_captures %>% 
-  filter(start_date <= Acquisitio) %>%
+  filter(start_date <= `Acquisition Date`) %>%
   as.data.frame() # convert from SF back to regular DF
+
+fac_captures$`Display ID` <- as.character(fac_captures$`Display ID`)
 
 write.csv(fac_captures, "fac_captures.csv")
 ```
+
 
 # Missiles Capture Occurences
 ```{r}
@@ -106,9 +61,11 @@ miss_captures$polygon_geometry <- st_as_text(miss_captures$polygon_geometry)
 
 # filter the dataset to remove cases where the photo was taken before construction started
 miss_captures <- miss_captures %>% 
-  filter(start_date <= Acquisitio,
-         ifelse(!is.na(end_date), end_date >= Acquisitio, TRUE)) %>%
+  filter(start_date <= `Acquisition Date`,
+         ifelse(!is.na(end_date), end_date >= `Acquisition Date`, TRUE)) %>%
   as.data.frame() # convert from SF back to regular DF
+
+miss_captures$`Display ID` <- as.character(miss_captures$`Display ID`)
 
 write.csv(miss_captures, "miss_captures.csv")
 ```
