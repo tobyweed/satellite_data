@@ -104,7 +104,7 @@ server <- function(input, output, session) {
     popups <- c()
     
     # fill in fields of popup windows for markers
-    if(length(caps) >= 1){
+    if(nrow(caps) >= 1){
       for (i in 1:nrow(caps)) {
         # convert Camera Type field
         cam_letter <- recode(caps$`Camera Type`[i],
@@ -154,33 +154,34 @@ server <- function(input, output, session) {
       clearMarkers() %>%
       addCircleMarkers(data = fac_filtered_by_dates(),
                        lng = ~lng, lat = ~lat,
-                       radius = 5,
+                       radius = 2.8,
                        weight = 1,
-                       color = "blue",
+                       color = "#2a297b",
                        opacity = 1,
-                       fillOpacity = 0.5,
+                       fillOpacity = 1,
                        popup = ~paste(facility_name, "<br>",
                                       "Facility Start Date: ", start_date,
                                       ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
       ) %>%
-      # addMarkers(data = miss_filtered_by_dates(),
-      #            lng = ~lng, lat = ~lat,
-      #            icon = makeIcon(
-      #              iconUrl = "img/plain-triangle.png",
-      #              iconWidth = 10, iconHeight = 10,
-      #              iconAnchorX = 10, iconAnchorY = 10
-      #            ),
-      addCircleMarkers(data = miss_filtered_by_dates(),
-                       lng = ~lng, lat = ~lat,
-                       radius = 5,
-                       weight = 1,
-                       color = "yellow",
-                       opacity = 1,
-                       fillOpacity = 0.5,
+      addMarkers(data = miss_filtered_by_dates(),
+                 lng = ~lng, lat = ~lat,
+                 icon = makeIcon(
+                   iconUrl = "img/tri_#2a297b.png",
+                   iconWidth = 7.5, iconHeight = 7.5
+                 ),
                  popup = ~paste("Missile Site",
                                 "<br>Start Date: ", start_date,
-                                ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
-      )
+                                ifelse(input$showCaptures, "<br>Not Yet Photographed", "")))
+      # addCircleMarkers(data = miss_filtered_by_dates(),
+      #                  lng = ~lng, lat = ~lat,
+      #                  radius = 5,
+      #                  weight = 1,
+      #                  color = "yellow",
+      #                  opacity = 1,
+      #                  fillOpacity = 0.5,
+      #                  popup = ~paste("Missile Site",
+      #                                 "<br>Start Date: ", start_date,
+      #                                 ifelse(input$showCaptures, "<br>Not Yet Photographed", "")),
     
     if (input$showCaptures) {
       fac_caps <- captured_facs()
@@ -197,20 +198,19 @@ server <- function(input, output, session) {
       leafletProxy(mapId = 'map') %>%
         addCircleMarkers(data = fac_caps,
                          lng = fac_lngs, lat = fac_lats,
-                         radius = 5,
+                         radius = 2.8,
                          weight = 1,
-                         color = "red",
+                         color = "#dd2119",
                          opacity = 1,
-                         fillOpacity = 0.7,
+                         fillOpacity = 1,
                          popup = fac_popups
         ) %>%
-        addCircleMarkers(data = miss_caps,
+        addMarkers(data = miss_caps,
                          lng = miss_lngs, lat = miss_lats,
-                         radius = 5,
-                         weight = 1,
-                         color = "purple",
-                         opacity = 1,
-                         fillOpacity = 0.7,
+                         icon = makeIcon(
+                           iconUrl = "img/tri_#dd2119.png",
+                           iconWidth = 7.5, iconHeight = 7.5
+                         ),
                          popup = miss_popups,
         )
     }
