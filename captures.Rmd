@@ -44,7 +44,7 @@ fac_captures <- fac_captures %>%
   filter(start_date <= `Acquisition Date`) %>%
   as.data.frame() # convert from SF back to regular DF
 
-fac_captures$`Display ID` <- as.character(fac_captures$`Display ID`)
+# fac_captures$`Display ID` <- as.character(fac_captures$`Display ID`) # this should be unec.
 
 write.csv(fac_captures, "fac_captures.csv")
 ```
@@ -65,7 +65,7 @@ miss_captures <- miss_captures %>%
          ifelse(!is.na(end_date), end_date >= `Acquisition Date`, TRUE)) %>%
   as.data.frame() # convert from SF back to regular DF
 
-miss_captures$`Display ID` <- as.character(miss_captures$`Display ID`)
+# miss_captures$`Display ID` <- as.character(miss_captures$`Display ID`) # this should be unec.
 
 write.csv(miss_captures, "miss_captures.csv")
 ```

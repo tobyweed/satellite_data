@@ -7,6 +7,7 @@ date: "2023-09-25"
 ```{r}
 library(xlsx)
 library(tidyverse)
+library(sf)
 ```
 
 
@@ -118,20 +119,21 @@ sat <- rbind(sat1_2, sat3)
 # make wkt representation of sat geometry
 sat <- sat %>% 
   mutate(geometry = paste("POLYGON ((", 
-                          `NW Corner Lat dec`, " ", `NW Corner Long dec`, ",", 
-                          `NE Corner Lat dec`, " ", `NE Corner Long dec`, ",",
-                          `SE Corner Lat dec`, " ", `SE Corner Long dec`, ",",
-                          `SW Corner Lat dec`, " ", `SW Corner Long dec`, ",", 
-                          `NW Corner Lat dec`, " ", `NW Corner Long dec`, "))", sep = ""))
+                          `NW Corner Long dec`, " ", `NW Corner Lat dec`, ",", 
+                          `NE Corner Long dec`, " ", `NE Corner Lat dec`, ",",
+                          `SE Corner Long dec`, " ", `SE Corner Lat dec`, ",",
+                          `SW Corner Long dec`, " ", `SW Corner Lat dec`, ",", 
+                          `NW Corner Long dec`, " ", `NW Corner Lat dec`, "))", sep = ""))
 
 sat <- sat[, -c(13:32)]
+
+sat$`Display ID` <- as.character(sat$`Display ID`)
 
 write_csv(sat, "sat.csv")
 ```
 
 
-
-## clean up captures dataset (move this logic to captures.Rmd)
+## clean up captures dataset (this code is deprecated)
 ```{r}
 captures <- read_csv("captures.csv")[-1]
 
