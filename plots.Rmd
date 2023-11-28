@@ -35,7 +35,10 @@ length(unique(fac_captures$`Acquisition Date`)) # 1414
 
 length(unique(fac_captures$Mission)) # 269
 
-test <- fac_captures %>% 
+
+fac_caps <- fac_caps_orig
+
+fac_caps_grouped <- fac_caps %>% 
   group_by(facility_name, `Acquisition Date`, Mission) %>%
   summarise(n_caps = n()) # 5,018
 ```
@@ -43,11 +46,11 @@ test <- fac_captures %>%
 Naively, we could just group by facility name and Mission #. But there's a chance that the same Mission will capture some facilities multiple times.
 ```{r}
 # same mission & facility, diff dates?
-fac_captures %>% 
+fac_caps %>% 
   group_by(facility_name, Mission) %>%
   summarise(n_caps = n()) # 3,945 <- over 1,000 fewer than grouping including Date also, implying the same Mission often photographs the same site on multiple different days
 
-diffs_dates <- test %>% ungroup() %>%
+diffs_dates <- fac_caps_grouped %>% ungroup() %>%
   group_by(facility_name, Mission) %>%
   summarize(different_values = n_distinct(`Acquisition Date`) > 1,
             `Acquisition Date`) %>%
@@ -58,12 +61,12 @@ Looks like it's not uncommon for the same mission to visit the same site twice, 
 On the other hand, if we group by just facility name and acquisition date, we run the risk of ignoring cases where multiple different flyovers spotted the same facility on a single day.
 ```{r}
 # same dates & facility, diff mission?
-fac_captures %>% 
+fac_caps %>% 
   group_by(facility_name, `Acquisition Date`) %>%
   summarise(n_caps = n()) # 4,947 <-- 71 fewer than just by date, facility, *and* Mission, implying there are some cases where multiple missions photographed the same site on the same day.
 
 # why is this? Let's check out the cases where it happens.
-diffs_missions <- test %>% ungroup() %>%
+diffs_missions <- fac_caps_grouped %>% ungroup() %>%
   group_by(facility_name, `Acquisition Date`) %>%
   summarize(different_values = n_distinct(Mission) > 1,
             Mission) %>%
@@ -75,10 +78,10 @@ There are a few exceptions, however. See, for instance, "Krasnoyarsk-45 Electron
 
 To avoid double-counting, I'll make a new Mission # which only includes the first 4 digits of Mission #, and then group by this Mission #, facility name, and acquisition date.
 ```{r}
-fac_captures <- fac_captures %>%
+fac_caps <- fac_caps %>%
   mutate(`Abbreviated Mission` = substr(Mission,1,4) )
 
-capture_counts <- fac_captures %>% 
+capture_counts <- fac_caps %>% 
   group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`) %>%
   summarise(n_caps = n()) # 4,951 rows -- only 4 more rows than just grouping by name & date
 

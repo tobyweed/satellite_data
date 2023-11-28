@@ -39,7 +39,14 @@ fac_captures <- st_join(x = facs_sf, y = sat_sf, join = st_within)
 fac_captures$geometry <- st_as_text(fac_captures$geometry)
 fac_captures$polygon_geometry <- st_as_text(fac_captures$polygon_geometry)
 
-# filter the dataset to remove cases where the photo was taken before construction started
+# filter the dataset to remove cases where the photo was taken before construction started, including unknown start dates
+fac_caps_with_unknown <- fac_captures %>% 
+  filter(ifelse(is.na(start_date), TRUE, start_date <= `Acquisition Date`))%>%
+  as.data.frame() # convert from SF back to regular DF
+
+write.csv(fac_caps_with_unknown, "fac_caps_with_unknown.csv")
+
+# filter the dataset to remove cases where the photo was taken before construction started, excluding unknown start dates
 fac_captures <- fac_captures %>% 
   filter(start_date <= `Acquisition Date`) %>%
   as.data.frame() # convert from SF back to regular DF
@@ -60,6 +67,7 @@ miss_captures$geometry <- st_as_text(miss_captures$geometry)
 miss_captures$polygon_geometry <- st_as_text(miss_captures$polygon_geometry)
 
 # filter the dataset to remove cases where the photo was taken before construction started
+# note on dates: it's not clear how accurate/complete dates are. Are NA end dates b/c data wasn't available or b/c the site never stopped being used? Are start dates accurate?
 miss_captures <- miss_captures %>% 
   filter(start_date <= `Acquisition Date`,
          ifelse(!is.na(end_date), end_date >= `Acquisition Date`, TRUE)) %>%
