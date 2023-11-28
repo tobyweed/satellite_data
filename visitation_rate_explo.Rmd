@@ -1,0 +1,105 @@
+---
+title: "Facility visitation exploration"
+output: html_document
+date: "2023-11-28"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# load data
+```{r, include=FALSE}
+facs <- read_csv("facilities.csv")[-1]
+missiles <- read_csv("missiles.csv")[-1]
+fac_caps_orig <- read_csv("fac_captures.csv")[-1]
+miss_caps_orig <- read_csv("miss_captures.csv")[-1]
+
+# get date range
+min_date = min(append(facs$start_date, missiles$start_date), na.rm = TRUE)
+max_date = max(append(facs$start_date, missiles$start_date), na.rm = TRUE)
+```
+
+## Per-Facility Visitation Rate
+Generate a table with the counts of visits for each facility; visitation leaderboard
+
+First, let's think about how to define a "visit."
+
+Within each flyover, there are often multiple photos taken. To avoid this multi-counting, we want to find a way to identify specific flyovers.
+```{r}
+length(unique(fac_captures$`Acquisition Date`)) # 1414
+
+length(unique(fac_captures$Mission)) # 269
+
+
+fac_caps <- fac_caps_orig
+
+fac_caps_grouped <- fac_caps %>% 
+  group_by(facility_name, `Acquisition Date`, Mission) %>%
+  summarise(n_caps = n()) # 5,018
+```
+
+Naively, we could just group by facility name and Mission #. But there's a chance that the same Mission will capture some facilities multiple times.
+```{r}
+# same mission & facility, diff dates?
+fac_caps %>% 
+  group_by(facility_name, Mission) %>%
+  summarise(n_caps = n()) # 3,945 <- over 1,000 fewer than grouping including Date also, implying the same Mission often photographs the same site on multiple different days
+
+diffs_dates <- fac_caps_grouped %>% ungroup() %>%
+  group_by(facility_name, Mission) %>%
+  summarize(different_values = n_distinct(`Acquisition Date`) > 1,
+            `Acquisition Date`) %>%
+  filter(different_values)
+```
+Looks like it's not uncommon for the same mission to visit the same site twice, sometimes the next day and sometimes months later. 
+
+On the other hand, if we group by just facility name and acquisition date, we run the risk of ignoring cases where multiple different flyovers spotted the same facility on a single day.
+```{r}
+# same dates & facility, diff mission?
+fac_caps %>% 
+  group_by(facility_name, `Acquisition Date`) %>%
+  summarise(n_caps = n()) # 4,947 <-- 71 fewer than just by date, facility, *and* Mission, implying there are some cases where multiple missions photographed the same site on the same day.
+
+# why is this? Let's check out the cases where it happens.
+diffs_missions <- fac_caps_grouped %>% ungroup() %>%
+  group_by(facility_name, `Acquisition Date`) %>%
+  summarize(different_values = n_distinct(Mission) > 1,
+            Mission) %>%
+  filter(different_values)
+```
+On closer inspection, there are some cases where multiple Mission #'s spotted the same facility on the same day, but these seem to have been mostly caused by the same satellite having multiple cameras. For instance, KH-9 satellites have three cameras, which each received a different Mission #. The way this works is that only the first four digits of the Mission number are the actual mission number, but many Mission numbers also have the letter "A" or a "-B" where B is the "bucket number", which appears to correspond to the Camera Type.
+
+There are a few exceptions, however. See, for instance, "Krasnoyarsk-45 Electronchemical Plant - Diffusion (Zelenogorsk in Laughter)" on "1965-01-24"-- both Missions 1016-2 and 4015 seem to have photographed it on that day.
+
+To avoid double-counting, I'll make a new Mission # which only includes the first 4 digits of Mission #, and then group by this Mission #, facility name, and acquisition date.
+```{r}
+fac_caps <- fac_caps %>%
+  mutate(`Abbreviated Mission` = substr(Mission,1,4) )
+
+capture_counts <- fac_caps %>% 
+  group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`) %>%
+  summarise(n_caps = n()) # 4,951 rows -- only 4 more rows than just grouping by name & date
+
+# let's check out the cases
+capture_counts %>% ungroup() %>%
+  group_by(facility_name, `Acquisition Date`) %>%
+  summarize(different_values = n_distinct(`Abbreviated Mission`) > 1,
+            `Abbreviated Mission`) %>%
+  filter(different_values)
+```
+It appears that by grouping by date *and* the first 4 digits of Mission number, we avoid counting 4 events of double flyover as single capture occurences.
+
+Anyways, now we can check out the capture counts.
+```{r}
+total_counts <- capture_counts %>%
+  ungroup() %>%
+  group_by(facility_name) %>%
+  summarise(n_caps = sum(n_caps))
+  
+total_counts %>%
+  arrange(-n_caps)
+```
+First glance, this makes a lot of sense! For instance, targets in Russia receive *a lot* more attention than those elsewhere, with some of the least-watched targets being those in Japan.
+
