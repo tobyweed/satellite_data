@@ -34,14 +34,14 @@ fac_caps <- fac_caps_with_unknown %>%
 
 capture_counts <- fac_caps %>% 
   group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, start_date) %>%
-  summarise(n_caps = n())
+  summarise(n_caps = n()) 
 
-total_counts <- capture_counts %>%
+totals <- capture_counts %>%
   ungroup() %>%
   group_by(facility_name) %>%
   summarise(n_caps = sum(n_caps))
   
-total_counts %>%
+totals %>%
   arrange(-n_caps)
 ```
 
@@ -49,6 +49,99 @@ total_counts %>%
 Could chunk this by country/region? Or by time period (maybe organized around surveillance epochs?)
 
 Also make the ability to generate a plot with the yearly visitation of each site
+
+```{r}
+# make a plot of capture activity of Laboratory No. 2, Moscow
+
+# first, need captures per year
+yearly_counts <- capture_counts %>%
+  mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(facility_name, Year) %>%
+  summarise(n_caps = sum(n_caps)) %>%
+  ungroup()
+
+fac <- "Tajoura Enrichment Facility"
+
+yearly_counts %>% 
+  filter(facility_name == fac) %>%
+  ggplot(aes(x = Year, y = n_caps, group = 1)) +
+  geom_col()
+
+yearly_counts %>% 
+  filter(facility_name == fac) %>%
+  ggplot(aes(x = Year, y = n_caps, group = 1)) +
+  geom_line()
+```
+
+It looks like by far the most captures occur in the early 60s, especially in 1964:
+
+```{r}
+yearly_counts %>% group_by(Year) %>%
+  summarise(n_caps = sum(n_caps)) %>%
+  ggplot(aes(x = Year, y = n_caps)) +
+  geom_col()
+```
+
+How about the number of photos total, not just captures?
+
+```{r}
+sat <- read_csv("sat.csv")
+
+n_pics_per_year <- sat %>% mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(Year) %>%
+  summarise(n_pics = n())
+
+n_pics_per_year %>%
+  ggplot(aes(x = Year, y = n_pics)) +
+  geom_col()
+```
+It's smoother, but not totally smooth. Let's break it down by data source.
+
+```{r}
+n_pics_per_year_grouped <- sat %>% mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(Year, `Data Source`) %>%
+  summarise(n_pics = n())
+
+n_pics_per_year_grouped %>%
+  ggplot(aes(x = Year)) +
+  # geom_ribbon(aes(ymin = 0, ymax = n_pics, fill = `Data Source`), 
+  #             alpha = 0.6) + 
+  geom_area(aes(y = n_pics, fill = `Data Source`), 
+              alpha = 0.9) + 
+  scale_fill_manual(values = c("declass1" = "#7eb0d5", "declass2" = "#fd7f6f", "declass3" = "#01A66F"))
+```
+
+```{r}
+caps_by_year_source <- fac_caps %>% 
+  group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, start_date, `Data Source`) %>%
+  summarise(n_caps = n()) %>%
+  mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(Year, `Data Source`) %>%
+  summarise(n_caps = sum(n_caps)) %>%
+  ungroup()
+
+caps_by_year_source %>%
+  ggplot(aes(x = Year)) +
+  geom_area(aes(y = n_caps, fill = `Data Source`), 
+              alpha = 0.9) + 
+  scale_fill_manual(values = c("declass1" = "#7eb0d5", "declass2" = "#fd7f6f", "declass3" = "#01A66F"))
+```
+
+# average geometry footprint area by dataset
+
+# average resolution by dataset
+
+Worth noting that there are 14 pics with "year = NA".
+
+```{r}
+no_geom <- sat %>% filter(geometry == "POLYGON ((0 0,0 0,0 0,0 0,0 0))")
+
+no_geom %>%
+  group_by(`Data Source`) %>%
+  summarise(count = n())
+```
+
+
 
 ## Calculate and Plot Facility Coverage
 ```{r}
