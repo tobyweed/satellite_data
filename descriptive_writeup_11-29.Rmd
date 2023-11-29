@@ -1,0 +1,147 @@
+---
+title: "Descriptive Writeup"
+output: 
+  html_document:
+    toc: true
+date: "2023-11-29"
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(sf)
+library(leaflet)
+sat <- read_csv("sat.csv")
+sat1 <- sat %>% filter(`Data Source` == "declass1")
+sat2 <- sat %>% filter(`Data Source` == "declass2")
+sat3 <- sat %>% filter(`Data Source` == "declass3")
+```
+
+
+This document contains some overall description of the various declassified satellite imagery datasets that I've been playing around with for the last few months. They were downloaded from https://earthexplorer.usgs.gov/. 
+
+# Dataset Breakdown
+First, I'll briefly re-introduce the three data sources:
+
+## Declassified 1
+[Declassified 1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-declassified-data-declassified-satellite-imagery-1) is the product of a blanket declassification in 1995 and purportedly represents *all* of the images from the following satellite programs:
+
+- CORONA: 1960-1972.
+
+- ARGON: 1962-64
+
+- LANYARD: 1963.
+
+It's not clear which images come from which satellites systems. 
+
+The dataset contains 837088 images. A handful of different camera setups were used during the program:
+
+```{r}
+unique(sat1$`Camera Resolution`)
+unique(sat1$`Camera Type`)
+```
+
+It's not clear how the resolution of these cameras (e.g. "High" & "Low" resolution) compares to the later generations, i.e. KH-7 and KH-9.
+
+Here is the total "footprint" of the images in this dataset (shapefile supplied by USGS):
+```{r, include = FALSE}
+corona_coverage <- st_read("shps/declass1_shp/corona2.shp")
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = corona_coverage)
+```
+
+```{r, echo = FALSE}
+map
+```
+
+
+## Declassified 2
+
+[Declassified 2](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-declassified-data-declassified-satellite-imagery-2) is the product of a 2002 declassification involving the non-comprehensive declassification of imagery from the following programs:
+
+- KH-7 (GAMBIT): images taken between 1963 and 1967, the full lifespan of GAMBIT.
+
+- KH-9 (HEXAGON): images taken from 1973 to 1980, a subset of the operational period of HEXAGON.
+
+It's not clear whether all of the images from KH-7 were declassified or whether some were withheld. Only a subset of the KH-9 images were declassified. 
+
+The dataset contains 46,699 images. 
+
+KH-7 was used for higher-resolution surveillance. KH-9 had both a lower-resolution mapping camera and a higher-resolution surveillance camera, but only the mapping images were declassified in this declassification act:
+
+```{r}
+unique(sat2$`Camera Resolution`)
+unique(sat2$`Camera Type`)
+```
+
+Here is the total "footprint" of the images in this dataset (shapefile supplied by USGS):
+```{r, include = FALSE}
+corona_coverage <- st_read("shps/declass2_shp/declassii.shp")
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = corona_coverage)
+```
+
+```{r, echo = FALSE}
+map
+```
+
+
+## Declassified 3
+
+[Declassified 3](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-declassified-data-declassified-satellite-imagery-3) is the product of a 2011 declassification involving the non-comprehensive declassification of imagery from KH-9 (HEXAGON), which ran from 1971 to 1984. This includes images from the high-resolution surveillance camera, but the website says that "almost all of the imagery from these cameras were declassified in 2011" implying that some images remain classified.
+
+The dataset contains 531,321 images. Note that the website says that "The process to ingest and generate browse imagery for Declass-3 is ongoing," and suggests that the HEXAGON program generated over 670,000 scenes, indicating that the dataset which we have access to is missing a substantial chunk of the images from HEXAGON.
+
+Both the terrain mapping and surveillance imagery were included in this declassification:
+
+```{r}
+unique(sat3$`Camera Resolution`)
+unique(sat3$`Camera Type`)
+```
+
+Here is the total "footprint" of the images in this dataset (shapefile supplied by USGS):
+```{r, include = FALSE}
+corona_coverage <- st_read("shps/declass3_shp/declassiii.shp")
+
+map <- leaflet() %>%
+  addTiles() %>%
+  addPolygons(data = corona_coverage)
+```
+
+```{r, echo = FALSE}
+map
+```
+
+## Issues with the data
+The satellite imagery dataset has a number of limitations.
+
+### Inaccurate & Missing Coordinates
+It's not clear that the coordinates listed in the datasets are always accurate. USGS says “We do recommend viewing both the ‘Preview Image’ and ‘Show All Fields’ metadata before submitting your order. Browse viewing is a critical component in the order validation process. The effects of cloud cover and **the accuracy of the latitude and longitude coordinates can greatly affect the usability of the data**." Likewise, the [description of declassified 1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-declassified-data-declassified-satellite-imagery-1) says "Mathematical calculations based on camera operation and satellite path were used to approximate image coordinates. Since the accuracy of the coordinates varies according to the precision of information used for the derivation, users should inspect the preview image to verify that the area of interest is contained in the selected frame."
+
+Furthermore, 11,409 rows in the dataset (all from declass 2 and 3) simply have no associated coordinates:
+
+```{r}
+nrow(filter(sat, geometry == "POLYGON ((0 0,0 0,0 0,0 0,0 0))"))
+```
+
+### Missing images & incomplete data
+As mentioned above, `declass3` is a work-in-progress; over 100,000 images seem to be missing from it. There are also discrepancies in the number of images advertised for all three datasets on USGS earth explorer and the number that you can actually download, although the result is that you end up with *more* images than expected, not fewer. 
+
+It's also not cleary whether some critical images remain classified. [This source](https://nsarchive2.gwu.edu/NSAEBB/NSAEBB392/) indicates that KH-7 images of Isreal are still classified, for instance. The same source also has details on KH-8 or Gambit-3, imagery from which doesn't seem to have been declassified. There are other satellite surveillance programs from the overlapping time periods like GRAB, POPPY, and QUILL, though I haven't looked into which of these were image-takers.
+
+### No Acquisition Date
+One particular set of photos from mission 1205-3 in `declass3` has no acquisition date listed.
+
+```{r}
+filter(sat, is.na(`Acquisition Date`))
+```
+
+
+
+# Counting Captures
+## Basic Setup
+## Capture Occurences vs Photos
+## Breakdown

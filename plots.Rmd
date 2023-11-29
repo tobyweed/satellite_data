@@ -10,6 +10,7 @@ library(tidyverse)
 library(shiny)
 library(shinyjs)
 library(leaflet)
+library(sf)
 ```
 
 # load data
@@ -43,6 +44,15 @@ totals <- capture_counts %>%
   
 totals %>%
   arrange(-n_caps)
+```
+
+```{r}
+totals %>%
+  mutate(facility_name = reorder(facility_name,n_caps)) %>%
+  ggplot(aes(x = facility_name, y = n_caps)) +
+  geom_col() +
+  labs(x = NULL, y = "Average Area") + 
+  theme(axis.text.x = element_blank())
 ```
 
 
@@ -128,8 +138,63 @@ caps_by_year_source %>%
 ```
 
 # average geometry footprint area by dataset
+Many of the frames have truly massive footprints, with areas of 100s or 1000s. The average corresponds to about 15,000 square miles.
+```{r}
+# set.seed(2)
 
-# average resolution by dataset
+# Take a random sample of the dataset
+# sample_data <- sat[sample(nrow(sat), 10000), ]
+
+sample_sf <- st_as_sf(sat, wkt = "geometry")
+
+# Calculate the area of each geometry in the sample
+sample_sf$area <- st_area(sample_sf)
+
+sample_sf_trimmed <- sample_sf %>%
+  filter(area != 0)
+
+avgs <- sample_sf_trimmed %>%
+  st_drop_geometry() %>%
+  as.data.frame() %>%
+  group_by(`Data Source`) %>%
+  summarise(avg_area = mean(area))
+
+# Calculate the average area of the sampled geometries
+average_area <- mean(sample_sf_trimmed$area) # ~3.22, or about 69*69*3.22 = 15330 sq miles
+
+avgs %>%
+  ggplot(aes(x = `Data Source`, y = avg_area)) +
+  geom_col()
+```
+
+
+# portion of captures by camera resolution
+```{r}
+caps_by_cam <- fac_caps %>% 
+  group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, start_date, `Camera Resolution`) %>%
+  summarise(n_caps = n()) %>%
+  mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(Year, `Camera Resolution`) %>%
+  summarise(n_caps = sum(n_caps)) %>%
+  ungroup()
+
+caps_by_cam %>%
+  ggplot(aes(x = Year, y = n_caps, fill = `Camera Resolution`)) +
+  geom_col()
+```
+```{r}
+caps_by_cam <- fac_caps %>% 
+  group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, start_date, `Camera Type`) %>%
+  summarise(n_caps = n()) %>%
+  mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(Year, `Camera Type`) %>%
+  summarise(n_caps = sum(n_caps)) %>%
+  ungroup()
+
+caps_by_cam %>%
+  ggplot(aes(x = Year, y = n_caps, fill = `Camera Type`)) +
+  geom_col()
+```
 
 Worth noting that there are 14 pics with "year = NA".
 

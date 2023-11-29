@@ -3,6 +3,7 @@ declassified*
 sat.csv
 sat*.csv
 *.csv
+shps/
 
 rsconnect*
 .DS_Store

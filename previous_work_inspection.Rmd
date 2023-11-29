@@ -11,7 +11,7 @@ library(leaflet)
 ```
 
 ```{r}
-corona_coverage <- st_read("./corona2/corona2.shp")
+corona_coverage <- st_read("shps/declass1_shp/corona2.shp")
 
 map <- leaflet() %>%
   addTiles() %>%
