@@ -15,10 +15,6 @@ facs <- read_csv("facilities.csv")[-1]
 missiles <- read_csv("missiles.csv")[-1]
 fac_caps_orig <- read_csv("fac_captures.csv")[-1]
 miss_caps_orig <- read_csv("miss_captures.csv")[-1]
-
-# get date range
-min_date = min(append(facs$start_date, missiles$start_date), na.rm = TRUE)
-max_date = max(append(facs$start_date, missiles$start_date), na.rm = TRUE)
 ```
 
 ## Per-Facility Visitation Rate
