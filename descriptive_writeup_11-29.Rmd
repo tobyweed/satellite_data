@@ -17,12 +17,12 @@ sat3 <- sat %>% filter(`Data Source` == "declass3")
 ```
 
 
-This document contains some overall description of the various declassified satellite imagery datasets that I've been playing around with for the last few months. They were downloaded from https://earthexplorer.usgs.gov/. 
+This document contains visualizations and statistics describing the various declassified satellite imagery datasets that I've been playing around with for the last few months. They were downloaded from https://earthexplorer.usgs.gov/. 
 
 
-# Description
+# Results
 ### Total Images
-The dataset consists of 837,088 images taken between 1960 and 1984 by 5 different satellite systems (see Appendix A for more information about the different datasets). 
+The dataset consists of 837,088 images taken between 1960 and 1984 by 5 different satellite systems (see the Appendix for more information about the different datasets). 
 
 The following plot shows the temporal distribution of photos, broken down by data source.
 
@@ -64,10 +64,10 @@ avgs %>%
   ylab("Average Area (in lat/lng units)")
 ```
 
-Many of the frames--especially from the earlier programs in `declass1`--have truly massive footprints. The unit is "square lat/long points," which is a bit of an imprecise unit, but which I think corresponds to roughly 69*69 = ~ 4800 square miles. The overall average size for an image frame in the dataset is thus about 15,000 square miles.
+Many of the frames--especially from the earlier programs in `declass1`--have truly massive footprints. The unit of the y-axis in the plot above is "square lat/long points," which is a bit of an imprecise unit, but which corresponds (I think) to roughly 69\*69 = ~ 4800 square miles. The overall average size for an image frame in the dataset is thus about 4800\*3.22 ~= 15,000 square miles.
 
 ### Capture Coverage
-What we really care about is when these satellite images contain nuclear targets, such as facilities. By cross-referencing with the coordinates from dataset of facilities that Quido collated, we can get a rough count of which facilities have been photographed (acknowledging that many of these "capture occurences" may be false positives). See Appendix B for more on how captures were counted.
+What we really care about is whether and when these satellite images depict nuclear targets, such as facilities. By cross-referencing with the coordinates from dataset of facilities that Quido collated, we can get a rough count of which facilities have been photographed (acknowledging that many of these "capture occurences" may be false positives).
 
 ```{r, include = FALSE}
 facs <- read_csv("facilities.csv")[-1]
@@ -76,8 +76,8 @@ fac_caps_with_unknown <- read_csv("fac_caps_with_unknown.csv")[-1]
 ```
 
 
-Here is the facility coverage chart, which you've already seen.
-#### Calculate and Plot Facility Coverage
+The following two plots, versions of which you've already seen, depict the proportion of extant facilities which have ever been photographed each year.
+
 ```{r}
 # Build coverage DF
 get_coverage <- function(facs, fac_caps, counting_unknown) {
@@ -150,7 +150,7 @@ ggplot(coverage, aes(x = year)) +
 ```
 
 
-And this version assumes all facilities with unknown start dates were built in 1900:
+And this version assumes that all facilities with unknown start dates were built before 1940:
 ```{r}
 coverage <- get_coverage(facs, fac_caps_with_unknown, counting_unknown=TRUE)
 
@@ -165,8 +165,7 @@ ggplot(coverage, aes(x = year)) +
 ```
 
 ### Total Capture Activity
-
-By group:
+We might also be interested in how much "capture activity" there is over time, defined as the total number of times all facility visits by satellites in the program per year. This can be broken down by data source (again, see the Appendix for more on the different satellite programs and data sources):
 ```{r}
 fac_caps <- fac_caps_with_unknown %>%
   mutate(`Abbreviated Mission` = substr(Mission,1,4))
@@ -186,7 +185,7 @@ caps_by_year_source %>%
   scale_fill_manual(values = c("declass1" = "#7eb0d5", "declass2" = "#fd7f6f", "declass3" = "#01A66F"))
 ```
 
-By camera resolution:
+Total captures per year can also be broken down by camera resolution, which we might be interested in as a first pass at deducing which photos *actually* represent captures.
 ```{r}
 caps_by_cam <- fac_caps %>% 
   group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, start_date, `Camera Resolution`) %>%
@@ -202,7 +201,7 @@ caps_by_cam %>%
 ```
 
 ### Per-Facility Visitation
-Generate a table with the counts of visits for each facility; visitation leaderboard
+It's also worth examining how these capture occurrences break down between sites. As a first pass at this, here is a list of the absolute number of times each facility was "captured" during the period in question:
 
 ```{r, facility_visits}
 options(knitr.max.print = 200)
@@ -230,7 +229,7 @@ totals <- totals %>%
 print(totals, n = 157)
 ```
 
-And here's a histogram to give a sense of the distribution:
+And here's a histogram of the same list to give a sense of the distribution:
 
 ```{r}
 totals %>%
@@ -241,8 +240,25 @@ totals %>%
   theme(axis.text.x = element_blank())
 ```
 
+The capture frequency of an individual facility can also be plotted. I plan to include plots like these on the "facility pages" of the more extensive tool I'll be building out over the next few months. The following plot is typical in that it has a spike in activity in the early 60s.
 
-# Appendix A: Satellite Imagery Dataset Overview
+```{r}
+yearly_counts <- capture_counts %>%
+  mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(facility_name, Year) %>%
+  summarise(n_caps = sum(n_caps)) %>%
+  ungroup()
+
+fac <- "Laboratory No. 2, Moscow"
+
+yearly_counts %>% 
+  filter(facility_name == fac) %>%
+  ggplot(aes(x = Year, y = n_caps, group = 1)) +
+  geom_line()
+```
+
+
+# Appendix: Satellite Imagery Dataset Overview
 
 ## Declassified 1
 [Declassified 1](https://www.usgs.gov/centers/eros/science/usgs-eros-archive-declassified-data-declassified-satellite-imagery-1) is the product of a blanket declassification in 1995 and purportedly represents *all* of the images from the following satellite programs:
@@ -360,8 +376,3 @@ One particular set of 14 photos from mission 1205-3 in `declass3` has no acquisi
 ```{r}
 nrow(filter(sat, is.na(`Acquisition Date`)))
 ```
-
-
-
-# Appendix B: Counting Captures
-
