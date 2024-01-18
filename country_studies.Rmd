@@ -1,0 +1,70 @@
+---
+title: 'Country Case Study: India and China'
+output: html_document
+date: "2024-01-18"
+---
+
+```{r, include=FALSE}
+library(tidyverse)
+library(sf)
+library(leaflet)
+sat <- read_csv("sat.csv")
+facs <- read_csv("facilities.csv")[-1]
+fac_caps_no_unknown <- read_csv("fac_captures.csv")[-1]
+fac_caps_with_unknown <- read_csv("fac_caps_with_unknown.csv")[-1]
+```
+
+# Case Study: China
+
+filter per-facility vistation
+
+```{r, facility_visits}
+fac_caps <- fac_caps_no_unknown %>%
+  mutate(`Abbreviated Mission` = substr(Mission,1,4))
+
+capture_counts <- fac_caps %>% 
+  filter(country %in% c("India", "China")) %>%
+  group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, country, start_date) %>%
+  summarise(n_caps = n()) 
+
+totals <- capture_counts %>%
+  ungroup() %>%
+  group_by(facility_name, country) %>%
+  summarise(n_caps = sum(n_caps))
+
+totals <- totals %>%
+  arrange(-n_caps)
+
+print(totals, n = nrow(totals))
+```
+
+
+for each facility:
+- make a table/plot of yearly visitation, distinguishing between high- and low-rez
+- make a table w metadata of photos of the facilities. If you hover over a facility, its footprint shows up on the map next to it. If you click a link you can see the image. 
+
+```{r}
+fac_name <- "China Institute of Atomic Energy (Diffusion Lab)"
+
+yearly_counts <- capture_counts %>%
+  mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+  group_by(facility_name, Year) %>%
+  summarise(n_caps = sum(n_caps)) %>%
+  ungroup()
+
+yearly_counts %>% 
+  filter(facility_name == fac_name) %>%
+  ggplot(aes(x = Year, y = n_caps, group = 1)) +
+  geom_line()
+```
+
+
+
+
+```{r}
+# missing <- setdiff(unique(fac_caps_no_unknown$facility_name), unique(capture_counts$facility_name))
+# missing_df <- data.frame(facility_name = missing, n_caps = numeric(length(missing)))
+# 
+# totals <- rbind(totals, missing_df)
+```
+

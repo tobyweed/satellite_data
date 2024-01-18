@@ -530,7 +530,7 @@ totals <- capture_counts %>%
   summarise(n_caps = sum(n_caps))
 
 missing <- setdiff(unique(facs$facility_name), unique(capture_counts$facility_name))
-missing_df <- data.frame(facility_name = missing, n_caps = numeric(9))
+missing_df <- data.frame(facility_name = missing, n_caps = numeric(length(missing)))
 
 totals <- rbind(totals, missing_df)
   
