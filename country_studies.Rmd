@@ -23,19 +23,42 @@ fac_caps <- fac_caps_no_unknown %>%
   mutate(`Abbreviated Mission` = substr(Mission,1,4))
 
 capture_counts <- fac_caps %>% 
+  mutate(res = ifelse(`Camera Resolution` %in% c("Stereo High", "Vertical High", "2 to 4 feet"), "high", "low")) %>%
   filter(country %in% c("India", "China")) %>%
-  group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, country, start_date) %>%
-  summarise(n_caps = n()) 
+  group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, res, country, start_date) %>%
+  summarise(days_visited = 1, n_caps = n()) 
+  # summarise(n_caps = n()) 
 
 totals <- capture_counts %>%
   ungroup() %>%
-  group_by(facility_name, country) %>%
-  summarise(n_caps = sum(n_caps))
+  group_by(facility_name, res, country) %>%
+  summarise(n_caps = sum(n_caps), days_visited = sum(days_visited)) %>%
+  pivot_wider(id_cols = c(facility_name, country), 
+              names_from = res, 
+              values_from = c(days_visited, n_caps),
+              values_fill = 0)
 
 totals <- totals %>%
-  arrange(-n_caps)
+  arrange(-days_visited_high)
+  # arrange(-n_caps)
 
 print(totals, n = nrow(totals))
+```
+
+```{r}
+# Reshape data for ggplot2
+totals_long <- totals %>%
+  select(-c(n_caps_high, n_caps_low)) %>%
+  pivot_longer(cols = c(days_visited_high, days_visited_low),
+               names_to = c("res"))
+
+# Create stacked bar chart
+ggplot(totals_long, aes(x = facility_name, y = value, fill = res)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Stacked Bar Chart",
+       x = "facility",
+       y = "days visited") +
+  theme_minimal()
 ```
 
 
