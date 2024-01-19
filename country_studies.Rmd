@@ -11,7 +11,7 @@ library(leaflet)
 
 sat <- read_csv("sat.csv")
 facs <- read_csv("facilities.csv")[-1]
-fac_caps_no_unknown <- read_csv("fac_captures.csv")[-1]
+fac_caps_no_unknown <- read_csv("fac_caps_no_unknown.csv")[-1]
 fac_caps_with_unknown <- read_csv("fac_caps_with_unknown.csv")[-1]
 ```
 

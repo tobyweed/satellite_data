@@ -52,28 +52,24 @@ ui <- navbarPage("Nuclear Recon Explorer",
   ),
   
   tabPanel("Search",
-       sidebarLayout(
-           sidebarPanel(
-             # ngens: number slider
-             selectInput(inputId = "facility", 
-                         label = "Select a facility:", 
-                         choices = unique(facs$facility_name)),
-             actionButton(inputId = "search",
-                          label = "Search")
-           ), 
            mainPanel(
-             column(6,
-                uiOutput(outputId = "fac_name"),
-                uiOutput(outputId = "map2label"),
-                leafletOutput("map2", height = "300px", width = "400px"),
-                # uiOutput(outputId = "capture_plot_label"),
-                # plotOutput(outputId = "capture_plot")
-              ), 
-             column(6,
-                uiOutput(outputId = "capture_list")
-             )
+                     column(6,
+                            selectInput(inputId = "facility", 
+                                        label = "Select a facility:", 
+                                        choices = unique(facs$facility_name)),
+                     
+                            # actionButton(inputId = "search",
+                            #              label = "Search"),
+                            # uiOutput(outputId = "fac_name"),
+                            # uiOutput(outputId = "map2label"),
+                            leafletOutput("map2", height = "300px", width = "400px")
+                            # uiOutput(outputId = "capture_plot_label"),
+                            # plotOutput(outputId = "capture_plot")
+                     ), column(6,
+                               uiOutput("capture_table_label"),
+                               DTOutput(outputId = "capture_table")
+                     )
            )
-       )
     )
 )
 
@@ -214,13 +210,24 @@ server <- function(input, output, session) {
     map
   })
   
-  # map for Search page.
+  # render map for Search page on startup
   output$map2 <- renderLeaflet({
+    fac_name <-  input$facility
+    facility <- facs %>% filter(facility_name == fac_name)
+
     map <- leaflet(leafletOptions( minZoom = 0 )) %>%
       addTiles() %>%
-      setView(lng = 0,
-              lat = 0,
-              zoom = 1)
+      addCircleMarkers(data = facility,
+                       lng = facility$lng, lat = facility$lat,
+                       radius = 2.8,
+                       weight = 1,
+                       color = "#2a297b",
+                       opacity = 1,
+                       fillOpacity = 1
+                       # popup = fac_popups
+      ) %>%
+      setView(lng = facility$lng, lat = facility$lat, zoom = 5)
+    
     map
   })
   
@@ -246,17 +253,17 @@ server <- function(input, output, session) {
   })
   
   # search for a facility
-  observeEvent(eventExpr = { input$search }, handlerExpr = {
+  observeEvent(eventExpr = { input$facility }, handlerExpr = {
     fac_name <-  input$facility
     facility <- facs %>% filter(facility_name == fac_name)
     
-    output$fac_name <- renderUI({
-      HTML(paste("<strong>Facility Name:</strong>", fac_name, "<br><br>"))
-    })
-      
-    output$map2label <- renderUI({
-      HTML("<strong>Map:</strong>")})
-    
+    # output$fac_name <- renderUI({
+    #   HTML(paste("<strong>Facility Name:</strong>", fac_name, "<br><br>"))
+    # })
+    #   
+    # output$map2label <- renderUI({
+    #   HTML("<strong>Map:</strong>")})
+    # 
     # create map marker, adjust map zoom
     leafletProxy(mapId = 'map2') %>%
       clearMarkers() %>%
@@ -298,47 +305,24 @@ server <- function(input, output, session) {
     #     geom_col()  
     # })
     
-    output$capture_list_label <- renderUI({
-      HTML("<strong>List of Capture Occurences: </strong>")
-    })
+    # output$capture_table_label <- renderUI({
+    #   HTML("<strong>List of Capture Occurences: </strong>")
+    # })
     
     cap_table <- fac_caps %>%
       filter(facility_name == fac_name) %>%
-      select(`Acquisition Date`, Mission, `Camera Resolution`, `Data Source`) %>%
-      mutate()
+      select(`Acquisition Date`, Mission, `Camera Resolution`, `Data Source`, pic_URL)
+      # datatable()
     
-    output$capture_list <- renderUI({
-      HTML("<br><strong>Capture Plot: </strong>")
-    })
+    cap_table$pic_URL <- sprintf('<a href="%s" target="_blank" class="btn btn-primary">See Image</a>',cap_table$pic_URL)
     
+    output$capture_table <- renderDT({
+      datatable(cap_table,
+                selection = "none",
+                escape = FALSE)
+    }, escape = FALSE)
+
   })
 }
 
 shinyApp(ui, server)
-
-
-
-
-# # convert Camera Type field
-# cam_letter <- recode(caps$`Camera Type`[i],
-#                      "Vertical" = "V",
-#                      "Aft" = "A",
-#                      "Cartographic" = "C",
-#                      "Forward" = "F"
-# )
-# 
-# # build URL
-# pic_url <- ""
-# 
-# if(caps$`Data Source`[i] == "declass1") {
-#   pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839febdccb64b3/",
-#                    caps$`Display ID`[i], sep = "")
-#   
-#   #5e839febdccb64b3? 
-# } else if(caps$`Data Source`[i] == "declass2") {
-#   pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839ff7d71d4811/",
-#                    caps$`Display ID`[i], sep = "")
-# } else if(caps$`Data Source`[i] == "declass3") {
-#   pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e7c41f3ffaaf662/",
-#                    caps$`Display ID`[i], sep = "")
-# }
