@@ -8,6 +8,7 @@ date: "2024-01-18"
 library(tidyverse)
 library(sf)
 library(leaflet)
+
 sat <- read_csv("sat.csv")
 facs <- read_csv("facilities.csv")[-1]
 fac_caps_no_unknown <- read_csv("fac_captures.csv")[-1]

@@ -3,11 +3,12 @@ library(tidyverse)
 library(shiny)
 library(shinyjs)
 library(leaflet)
+library(DT)
 
 ## SETUP 
 facs <- read_csv("facilities.csv")[-1]
 missiles <- read_csv("missiles.csv")[-1]
-fac_caps <- read_csv("fac_captures.csv")[-1]
+fac_caps <- read_csv("fac_caps_with_unknown.csv")[-1]
 miss_caps <- read_csv("miss_captures.csv")[-1]
 
 # get date range
@@ -133,34 +134,10 @@ server <- function(input, output, session) {
     # fill in fields of popup windows for markers
     if(nrow(caps) >= 1){
       for (i in 1:nrow(caps)) {
-        # convert Camera Type field
-        cam_letter <- recode(caps$`Camera Type`[i],
-                             "Vertical" = "V",
-                             "Aft" = "A",
-                             "Cartographic" = "C",
-                             "Forward" = "F"
-        )
-        
-        # build URL
-        pic_url <- ""
-        
-        if(caps$`Data Source`[i] == "declass1") {
-          pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839febdccb64b3/",
-                           caps$`Display ID`[i], sep = "")
-          
-          #5e839febdccb64b3? 
-        } else if(caps$`Data Source`[i] == "declass2") {
-          pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839ff7d71d4811/",
-                           caps$`Display ID`[i], sep = "")
-        } else if(caps$`Data Source`[i] == "declass3") {
-          pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e7c41f3ffaaf662/",
-                           caps$`Display ID`[i], sep = "")
-        }
-        
         popup <- paste(ifelse(is_facs, paste(caps$facility_name[i], "<br>"), "Missile Site <br>"),
                        "Start Date: ", caps$start_date[i], "<br>",
                        "Most Recently Photographed: ", caps$`Acquisition Date`[i], "<br>",
-                       a("Click to See Image and Metadata", href = pic_url, target="_blank" ))
+                       a("Click to See Image and Metadata", href = caps$pic_URL[i], target="_blank" ))
         
         popups <- c(popups, popup)
       }
@@ -321,6 +298,15 @@ server <- function(input, output, session) {
     #     geom_col()  
     # })
     
+    output$capture_list_label <- renderUI({
+      HTML("<strong>List of Capture Occurences: </strong>")
+    })
+    
+    cap_table <- fac_caps %>%
+      filter(facility_name == fac_name) %>%
+      select(`Acquisition Date`, Mission, `Camera Resolution`, `Data Source`) %>%
+      mutate()
+    
     output$capture_list <- renderUI({
       HTML("<br><strong>Capture Plot: </strong>")
     })
@@ -329,3 +315,30 @@ server <- function(input, output, session) {
 }
 
 shinyApp(ui, server)
+
+
+
+
+# # convert Camera Type field
+# cam_letter <- recode(caps$`Camera Type`[i],
+#                      "Vertical" = "V",
+#                      "Aft" = "A",
+#                      "Cartographic" = "C",
+#                      "Forward" = "F"
+# )
+# 
+# # build URL
+# pic_url <- ""
+# 
+# if(caps$`Data Source`[i] == "declass1") {
+#   pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839febdccb64b3/",
+#                    caps$`Display ID`[i], sep = "")
+#   
+#   #5e839febdccb64b3? 
+# } else if(caps$`Data Source`[i] == "declass2") {
+#   pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839ff7d71d4811/",
+#                    caps$`Display ID`[i], sep = "")
+# } else if(caps$`Data Source`[i] == "declass3") {
+#   pic_url <- paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e7c41f3ffaaf662/",
+#                    caps$`Display ID`[i], sep = "")
+# }
