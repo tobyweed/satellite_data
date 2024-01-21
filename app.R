@@ -146,7 +146,7 @@ server <- function(input, output, session) {
   }
   
   # add markers where there should be markers
-  create_markers <- function() {
+  populate_map1 <- function() {
     leafletProxy(mapId = 'map1') %>%
       clearMarkers() %>%
       addCircleMarkers(data = fac_filtered_by_dates(),
@@ -213,10 +213,57 @@ server <- function(input, output, session) {
     map
   })
   
+  
+  
   # remove the countries listed after the facility names in the input, in the format "Facility Name [Country]"
   remove_country_name <- function(fac_name_string) {
     sub(" \\[.*\\]", "", fac_name_string)
   }
+  
+  # add markers to the Search map
+  populate_map2 <- function(fac_names) {
+    facilities <- facs %>% filter(facility_name %in% fac_names)
+    
+    leafletProxy(mapId = 'map2') %>%
+      clearMarkers() %>%
+      addCircleMarkers(data = facilities,
+                       lng = facilities$lng, lat = facilities$lat,
+                       radius = 2.8,
+                       weight = 1,
+                       color = "#2a297b",
+                       opacity = 1,
+                       fillOpacity = 1
+                       # popup = fac_popups
+      )
+  }
+  
+  # create capture table
+  create_capture_table <- function(fac_names) {
+    # create capture table
+    output$capture_table_label <- renderUI({
+      HTML("<h3>List of Capture Occurences: </h3>")
+    })
+    
+    cap_table <- fac_caps %>%
+      filter(facility_name %in% fac_names) %>%
+      select(`Acquisition Date`, facility_name, Mission, `Camera Resolution`, `Data Source`, pic_URL)
+    # datatable()
+    
+    colnames(cap_table) <- c("Acquisition Date", "Facility", "Mission", "Camera Resolution", "Data Source", "Photo URL")
+    
+    cap_table$`Photo URL` <- sprintf('<a href="%s" target="_blank" class="btn btn-primary">See Image</a>',cap_table$`Photo URL`)
+    
+    output$capture_table <- renderDT({
+      datatable(cap_table,
+                options = list(
+                  selection = "none", # disable selecting a row
+                  lengthMenu = c(5, 10, 15), # Set the options for the number of entries per page
+                  pageLength = 5 # Set the default number of entries per page
+                ),
+                escape = FALSE)
+    }, escape = FALSE)
+  }
+  
   
   # render map for Search page on startup
   output$map2 <- renderLeaflet({
@@ -234,7 +281,6 @@ server <- function(input, output, session) {
                        fillOpacity = 1
                        # popup = fac_popups
       ) 
-      # setView(lng = facilities$lng, lat = facilities$lat, zoom = 5)
     
     map
   })
@@ -245,90 +291,68 @@ server <- function(input, output, session) {
   # re-create map whenever date slider is changed
   observeEvent(eventExpr = { input$dateSlider }, handlerExpr = {
     adjust_nas()
-    create_markers()
+    populate_map1()
   })
   
   # re-create map when showUnkown checkbox is toggled
   observeEvent(eventExpr = { input$showUnknown }, handlerExpr = {
     adjust_nas()
-    create_markers()
+    populate_map1()
   })
   
   # re-create map when showUnkown checkbox is toggled
   observeEvent(eventExpr = { input$showCaptures }, handlerExpr = {
     adjust_nas()
-    create_markers()
+    populate_map1()
   })
   
-  # search for a facility
+  # search for a facility by name
   observeEvent(eventExpr = { input$facility }, handlerExpr = {
     fac_names <-  remove_country_name(input$facility)
-    facilities <- facs %>% filter(facility_name %in% fac_names)
-    
-    leafletProxy(mapId = 'map2') %>%
-      clearMarkers() %>%
-      addCircleMarkers(data = facilities,
-                       lng = facilities$lng, lat = facilities$lat,
-                       radius = 2.8,
-                       weight = 1,
-                       color = "#2a297b",
-                       opacity = 1,
-                       fillOpacity = 1
-                       # popup = fac_popups
-      )
-      # setView(lng = facilities$lng, lat = facilities$lat, zoom = 5)
-    
-    # output$capture_plot_label <- renderUI({
-    #   HTML("<br><strong>Capture Plot: </strong>")
-    # })
-    
-    # # create capture plot
-    # capture_counts <- fac_caps %>%
-    #   mutate(`Abbreviated Mission` = substr(Mission,1,4)) %>%
-    #   filter(facility_name == fac_name) %>%
-    #   group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, start_date) %>%
-    #   summarise(n_caps = n()) 
-    # 
-    # yearly_counts <- capture_counts %>%
-    #   mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
-    #   group_by(facility_name, Year) %>%
-    #   summarise(n_caps = sum(n_caps)) %>%
-    #   ungroup()
-    # 
-    # yearly_counts %>% 
-    #   ggplot(aes(x = Year, y = n_caps, group = 1)) +
-    #   geom_line()  
-    # 
-    # output$capture_plot <- renderPlot({
-    #   yearly_counts %>% 
-    #     ggplot(aes(x = Year, y = n_caps, group = 1)) +
-    #     geom_col()  
-    # })
-    
-    output$capture_table_label <- renderUI({
-      HTML("<h3>List of Capture Occurences: </h3>")
-    })
-    
-    cap_table <- fac_caps %>%
-      filter(facility_name %in% fac_names) %>%
-      select(`Acquisition Date`, facility_name, Mission, `Camera Resolution`, `Data Source`, pic_URL)
-      # datatable()
-    
-    colnames(cap_table) <- c("Acquisition Date", "Facility", "Mission", "Camera Resolution", "Data Source", "Photo URL")
-    
-    cap_table$`Photo URL` <- sprintf('<a href="%s" target="_blank" class="btn btn-primary">See Image</a>',cap_table$`Photo URL`)
-    
-    output$capture_table <- renderDT({
-      datatable(cap_table,
-                options = list(
-                  selection = "none", # disable selecting a row
-                  lengthMenu = c(5, 10, 15), # Set the options for the number of entries per page
-                  pageLength = 5 # Set the default number of entries per page
-                ),
-                escape = FALSE)
-    }, escape = FALSE)
-
+    populate_map2(fac_names)
+    create_capture_table(fac_names)
   })
+  
+  # search for a facility by country
+  observeEvent(eventExpr = { input$country }, handlerExpr = {
+    facs_of_country <-  facs %>% 
+      filter(country %in% input$country)
+    
+    fac_names <- unique(facs_of_country$facility_name)
+    
+    populate_map2(fac_names)
+    create_capture_table(fac_names)
+  })
+  
+  
 }
 
 shinyApp(ui, server)
+
+
+
+## SCRATCH
+
+
+# # create capture plot
+# capture_counts <- fac_caps %>%
+#   mutate(`Abbreviated Mission` = substr(Mission,1,4)) %>%
+#   filter(facility_name == fac_name) %>%
+#   group_by(facility_name, `Acquisition Date`, `Abbreviated Mission`, start_date) %>%
+#   summarise(n_caps = n()) 
+# 
+# yearly_counts <- capture_counts %>%
+#   mutate(`Year` = as.numeric(substr(`Acquisition Date`,1,4))) %>%
+#   group_by(facility_name, Year) %>%
+#   summarise(n_caps = sum(n_caps)) %>%
+#   ungroup()
+# 
+# yearly_counts %>% 
+#   ggplot(aes(x = Year, y = n_caps, group = 1)) +
+#   geom_line()  
+# 
+# output$capture_plot <- renderPlot({
+#   yearly_counts %>% 
+#     ggplot(aes(x = Year, y = n_caps, group = 1)) +
+#     geom_col()  
+# })
