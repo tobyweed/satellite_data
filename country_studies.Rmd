@@ -41,7 +41,10 @@ totals <- capture_counts %>%
 
 totals <- totals %>%
   arrange(-days_visited_high)
-  # arrange(-n_caps)
+
+colnames(totals) <- c("Facility", "Country", "# of Days Photographed (high res)", "# of Days Photographed (low res)", "# of Photos Taken (high res)", "# of Photos Taken (low res)")
+
+totals <- totals[, c(1, 2, 3, 4)]
 
 print(totals, n = nrow(totals))
 ```

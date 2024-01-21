@@ -27,12 +27,10 @@ ui <- navbarPage("Nuclear Recon Explorer",
                                                     border-bottom: 1px solid red ;}
         .subtitle { padding-left: 15px; 
                     color: #808080; }
+        .selectize-input { max-height: 200px;
+                           overflow-y: auto;}
       "),
-  # titlePanel("Explore U.S. Satellite Reconnaissance of Nuclear Targets from 1941-1985"),
-  # fluidRow(
-  #   h3("Explore U.S. Satellite Reconnaissance of Nuclear Targets from 1941-1985", class = "subtitle"),
-  #   br()
-  # ),
+  
   tabPanel("Map",
     sidebarLayout(
       sidebarPanel(HTML("<strong>Filter Facilities and Missiles</strong>"),
@@ -55,9 +53,14 @@ ui <- navbarPage("Nuclear Recon Explorer",
            mainPanel(
                      column(6,
                             selectInput(inputId = "facility", 
-                                        label = "Select a facility:", 
-                                        choices = unique(facs$facility_name)),
-                     
+                                       label = "Select Facilities By Name:",
+                                       choices = paste(facs$facility_name, " [", facs$country, "]", sep = ""),
+                                       multiple = TRUE),
+                            selectInput(inputId = "country",
+                                       label = "Select Facilities By Country:",
+                                       choices = unique(facs$country),
+                                       multiple = TRUE),
+                            br(),
                             # actionButton(inputId = "search",
                             #              label = "Search"),
                             # uiOutput(outputId = "fac_name"),
@@ -210,23 +213,28 @@ server <- function(input, output, session) {
     map
   })
   
+  # remove the countries listed after the facility names in the input, in the format "Facility Name [Country]"
+  remove_country_name <- function(fac_name_string) {
+    sub(" \\[.*\\]", "", fac_name_string)
+  }
+  
   # render map for Search page on startup
   output$map2 <- renderLeaflet({
-    fac_name <-  input$facility
-    facility <- facs %>% filter(facility_name == fac_name)
+    fac_names <-  remove_country_name(input$facility)
+    facilities <- facs %>% filter(facility_name %in% fac_names)
 
     map <- leaflet(leafletOptions( minZoom = 0 )) %>%
       addTiles() %>%
-      addCircleMarkers(data = facility,
-                       lng = facility$lng, lat = facility$lat,
+      addCircleMarkers(data = facilities,
+                       lng = facilities$lng, lat = facilities$lat,
                        radius = 2.8,
                        weight = 1,
                        color = "#2a297b",
                        opacity = 1,
                        fillOpacity = 1
                        # popup = fac_popups
-      ) %>%
-      setView(lng = facility$lng, lat = facility$lat, zoom = 5)
+      ) 
+      # setView(lng = facilities$lng, lat = facilities$lat, zoom = 5)
     
     map
   })
@@ -254,29 +262,21 @@ server <- function(input, output, session) {
   
   # search for a facility
   observeEvent(eventExpr = { input$facility }, handlerExpr = {
-    fac_name <-  input$facility
-    facility <- facs %>% filter(facility_name == fac_name)
+    fac_names <-  remove_country_name(input$facility)
+    facilities <- facs %>% filter(facility_name %in% fac_names)
     
-    # output$fac_name <- renderUI({
-    #   HTML(paste("<strong>Facility Name:</strong>", fac_name, "<br><br>"))
-    # })
-    #   
-    # output$map2label <- renderUI({
-    #   HTML("<strong>Map:</strong>")})
-    # 
-    # create map marker, adjust map zoom
     leafletProxy(mapId = 'map2') %>%
       clearMarkers() %>%
-      addCircleMarkers(data = facility,
-                       lng = facility$lng, lat = facility$lat,
+      addCircleMarkers(data = facilities,
+                       lng = facilities$lng, lat = facilities$lat,
                        radius = 2.8,
                        weight = 1,
                        color = "#2a297b",
                        opacity = 1,
                        fillOpacity = 1
                        # popup = fac_popups
-      ) %>%
-      setView(lng = facility$lng, lat = facility$lat, zoom = 5)
+      )
+      # setView(lng = facilities$lng, lat = facilities$lat, zoom = 5)
     
     # output$capture_plot_label <- renderUI({
     #   HTML("<br><strong>Capture Plot: </strong>")
@@ -305,20 +305,26 @@ server <- function(input, output, session) {
     #     geom_col()  
     # })
     
-    # output$capture_table_label <- renderUI({
-    #   HTML("<strong>List of Capture Occurences: </strong>")
-    # })
+    output$capture_table_label <- renderUI({
+      HTML("<h3>List of Capture Occurences: </h3>")
+    })
     
     cap_table <- fac_caps %>%
-      filter(facility_name == fac_name) %>%
-      select(`Acquisition Date`, Mission, `Camera Resolution`, `Data Source`, pic_URL)
+      filter(facility_name %in% fac_names) %>%
+      select(`Acquisition Date`, facility_name, Mission, `Camera Resolution`, `Data Source`, pic_URL)
       # datatable()
     
-    cap_table$pic_URL <- sprintf('<a href="%s" target="_blank" class="btn btn-primary">See Image</a>',cap_table$pic_URL)
+    colnames(cap_table) <- c("Acquisition Date", "Facility", "Mission", "Camera Resolution", "Data Source", "Photo URL")
+    
+    cap_table$`Photo URL` <- sprintf('<a href="%s" target="_blank" class="btn btn-primary">See Image</a>',cap_table$`Photo URL`)
     
     output$capture_table <- renderDT({
       datatable(cap_table,
-                selection = "none",
+                options = list(
+                  selection = "none", # disable selecting a row
+                  lengthMenu = c(5, 10, 15), # Set the options for the number of entries per page
+                  pageLength = 5 # Set the default number of entries per page
+                ),
                 escape = FALSE)
     }, escape = FALSE)
 
