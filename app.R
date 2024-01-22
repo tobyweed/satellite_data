@@ -88,7 +88,7 @@ ui <- navbarPage("Nuclear Recon Explorer",
                             leafletOutput("map2", height = "300px", width = "400px")
                      ), column(6,
                                uiOutput("capture_table_label"),
-                               DTOutput(outputId = "capture_table")
+                               DTOutput(outputId = "capture_table", width = "200%")
                      )
            )
     )
@@ -236,35 +236,22 @@ server <- function(input, output, session) {
     sub(" \\[.*\\]", "", fac_name_string)
   }
   
-  # # add markers to the Search map
-  # populate_map2 <- function(fac_names) {
-  #   facilities <- facs %>% filter(facility_name %in% fac_names)
-  #   
-  #   leafletProxy(mapId = 'map2') %>%
-  #     clearMarkers() %>%
-  #     addCircleMarkers(data = facilities,
-  #                      lng = facilities$lng, lat = facilities$lat,
-  #                      radius = 2.8,
-  #                      weight = 1,
-  #                      color = "#2a297b",
-  #                      opacity = 1,
-  #                      fillOpacity = 1,
-  #                      popup = ~paste(facility_name, "<br>",
-  #                                     "Facility Start Date: ", start_date)
-  #     )
-  # }
-  
   # create capture table
   create_capture_table <- function(fac_names) {
     # create capture table
     output$capture_table_label <- renderUI({
-      HTML("<h3>List of Capture Occurences: </h3>")
+      if(input$searchmode == "Facility name") {
+        HTML("<h4>List of captures of selected facilities: </h4>")
+      } else if (input$searchmode == "Country") {
+        HTML(paste("<h4>List of captures of facilities in ", paste(input$country, collapse=", "), ":</h4>", sep=""))
+      }
     })
+    
+    print("here!")
     
     cap_table <- fac_caps %>%
       filter(facility_name %in% fac_names) %>%
       select(`Acquisition Date`, facility_name, Mission, `Camera Resolution`, `Data Source`, pic_URL)
-    # datatable()
     
     colnames(cap_table) <- c("Acquisition Date", "Facility", "Mission", "Camera Resolution", "Data Source", "Photo URL")
     
@@ -273,10 +260,10 @@ server <- function(input, output, session) {
     output$capture_table <- renderDT({
       datatable(cap_table,
                 options = list(
-                  selection = "none", # disable selecting a row
-                  lengthMenu = c(5, 10, 15), # Set the options for the number of entries per page
-                  pageLength = 5 # Set the default number of entries per page
+                  lengthMenu = c(5, 10, 15), # set the options for the number of entries per page
+                  pageLength = 5 # set the default number of entries per page
                 ),
+                selection = "none", # disable selecting rows to get rid of annoying blue selection
                 escape = FALSE)
     }, escape = FALSE)
   }
@@ -338,7 +325,6 @@ server <- function(input, output, session) {
   observeEvent(eventExpr = { input$facility }, handlerExpr = {
     fac_names <-  remove_country_name(input$facility)
     
-    # populate_map2(fac_names)
     create_capture_table(fac_names)
   })
   
@@ -347,7 +333,6 @@ server <- function(input, output, session) {
     facs_of_country <- filter(facs, country %in% input$country)
     fac_names <- unique(facs_of_country$facility_name)
     
-    # populate_map2(fac_names)
     create_capture_table(fac_names)
   })
   
