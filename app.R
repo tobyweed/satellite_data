@@ -29,6 +29,8 @@ ui <- navbarPage("Nuclear Recon Explorer",
                     color: #808080; }
         .selectize-input { max-height: 200px;
                            overflow-y: auto;}
+        .leaflet-control-zoom { z-index: -1;
+                                color = 'red';}
       "),
   
   tabPanel("Map",
@@ -52,22 +54,38 @@ ui <- navbarPage("Nuclear Recon Explorer",
   tabPanel("Search",
            mainPanel(
                      column(6,
-                            selectInput(inputId = "facility", 
-                                       label = "Select Facilities By Name:",
-                                       choices = paste(facs$facility_name, " [", facs$country, "]", sep = ""),
-                                       multiple = TRUE),
-                            selectInput(inputId = "country",
-                                       label = "Select Facilities By Country:",
-                                       choices = unique(facs$country),
-                                       multiple = TRUE),
+                            selectInput(
+                              inputId = "searchmode",
+                              label = "Select Facilities by:",
+                              choices = c("Facility name", "Country")
+                            ),
+                            # switchInput(
+                            #   inputId = "mySwitch",
+                            #   label = "Toggle Mode",
+                            #   onLabel = "Select by Facility",
+                            #   offLabel = "Select by Country",
+                            #   labelWidth = 50,
+                            #   handleWidth = 200
+                            # ),
+                            conditionalPanel(
+                              condition = "input.searchmode == 'Facility name'",
+                              selectInput(inputId = "facility",
+                                          label = "Select facilities:",
+                                          choices = paste(facs$facility_name, " [", facs$country, "]", sep = ""),
+                                          multiple = TRUE)
+                            ),
+                            conditionalPanel(
+                              condition = "input.searchmode == 'Country'",
+                              selectInput(inputId = "country",
+                                          label = "Select countries:",
+                                          choices = unique(facs$country),
+                                          multiple = TRUE),
+                            ),
                             br(),
                             # actionButton(inputId = "search",
                             #              label = "Search"),
-                            # uiOutput(outputId = "fac_name"),
                             # uiOutput(outputId = "map2label"),
                             leafletOutput("map2", height = "300px", width = "400px")
-                            # uiOutput(outputId = "capture_plot_label"),
-                            # plotOutput(outputId = "capture_plot")
                      ), column(6,
                                uiOutput("capture_table_label"),
                                DTOutput(outputId = "capture_table")
@@ -213,29 +231,28 @@ server <- function(input, output, session) {
     map
   })
   
-  
-  
   # remove the countries listed after the facility names in the input, in the format "Facility Name [Country]"
   remove_country_name <- function(fac_name_string) {
     sub(" \\[.*\\]", "", fac_name_string)
   }
   
-  # add markers to the Search map
-  populate_map2 <- function(fac_names) {
-    facilities <- facs %>% filter(facility_name %in% fac_names)
-    
-    leafletProxy(mapId = 'map2') %>%
-      clearMarkers() %>%
-      addCircleMarkers(data = facilities,
-                       lng = facilities$lng, lat = facilities$lat,
-                       radius = 2.8,
-                       weight = 1,
-                       color = "#2a297b",
-                       opacity = 1,
-                       fillOpacity = 1
-                       # popup = fac_popups
-      )
-  }
+  # # add markers to the Search map
+  # populate_map2 <- function(fac_names) {
+  #   facilities <- facs %>% filter(facility_name %in% fac_names)
+  #   
+  #   leafletProxy(mapId = 'map2') %>%
+  #     clearMarkers() %>%
+  #     addCircleMarkers(data = facilities,
+  #                      lng = facilities$lng, lat = facilities$lat,
+  #                      radius = 2.8,
+  #                      weight = 1,
+  #                      color = "#2a297b",
+  #                      opacity = 1,
+  #                      fillOpacity = 1,
+  #                      popup = ~paste(facility_name, "<br>",
+  #                                     "Facility Start Date: ", start_date)
+  #     )
+  # }
   
   # create capture table
   create_capture_table <- function(fac_names) {
@@ -267,10 +284,17 @@ server <- function(input, output, session) {
   
   # render map for Search page on startup
   output$map2 <- renderLeaflet({
-    fac_names <-  remove_country_name(input$facility)
-    facilities <- facs %>% filter(facility_name %in% fac_names)
-
-    map <- leaflet(leafletOptions( minZoom = 0 )) %>%
+    facilities <- NULL
+    
+    if(input$searchmode == "Facility name") {
+      fac_names <-  remove_country_name(input$facility)
+      facilities <- facs %>% filter(facility_name %in% fac_names)
+    } else if(input$searchmode == "Country") {
+      facilities <- filter(facs, country %in% input$country)
+    }
+    
+    map <- leaflet(options = leafletOptions( minZoom = 0,
+                                   zoomControl = FALSE )) %>%
       addTiles() %>%
       addCircleMarkers(data = facilities,
                        lng = facilities$lng, lat = facilities$lat,
@@ -278,10 +302,14 @@ server <- function(input, output, session) {
                        weight = 1,
                        color = "#2a297b",
                        opacity = 1,
-                       fillOpacity = 1
-                       # popup = fac_popups
-      ) 
-    
+                       fillOpacity = 1,
+                       popup = ~paste(facility_name, "<br>",
+                                      "Facility Start Date: ", start_date)
+      ) %>%
+      htmlwidgets::onRender("function(el, x) {
+          L.control.zoom({ position: 'bottomright' }).addTo(this)
+      }")
+      
     map
   })
   
@@ -309,18 +337,17 @@ server <- function(input, output, session) {
   # search for a facility by name
   observeEvent(eventExpr = { input$facility }, handlerExpr = {
     fac_names <-  remove_country_name(input$facility)
-    populate_map2(fac_names)
+    
+    # populate_map2(fac_names)
     create_capture_table(fac_names)
   })
   
-  # search for a facility by country
+  # search for facilities by country
   observeEvent(eventExpr = { input$country }, handlerExpr = {
-    facs_of_country <-  facs %>% 
-      filter(country %in% input$country)
-    
+    facs_of_country <- filter(facs, country %in% input$country)
     fac_names <- unique(facs_of_country$facility_name)
     
-    populate_map2(fac_names)
+    # populate_map2(fac_names)
     create_capture_table(fac_names)
   })
   
