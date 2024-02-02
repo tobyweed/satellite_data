@@ -467,14 +467,6 @@ ggplot(coverage, aes(x = year)) +
 ```
 
 
-```{r}
-
-# ribbon plot with types: unspotted, spotted in high resolution ("2 to 4 feet" or "stereo high"), spotted in low resolution only
-```
-
-
-
-
 ### Total Capture Activity
 We might also be interested in how much "capture activity" there is over time, defined as the total number of times all facility visits by satellites in the program per year. This can be broken down by data source (again, see the Appendix for more on the different satellite programs and data sources):
 ```{r}

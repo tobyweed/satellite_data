@@ -10,8 +10,7 @@ library(tidyverse)
 library(sf)
 ```
 
-
-# Scripts to clean up the original datasets supplied by Quido
+Scripts to clean up the original datasets supplied by Quido. This code should not need to be rerun ever
 
 ## clean up facilities dataset
 ```{r}
@@ -88,10 +87,6 @@ sat2$`Data Source` <- rep("declass2", nrow(sat2))
 reformat_id <- function(id, n) {
   id <- strsplit(id, ",")[[1]][1] # split by comma, take first item
   id
-  # this code inserted a "-", but I don't think that is actually necessary:
-  # # after the right n of characters insert "-"
-  # new_id <- paste(substr(id, 1, n), "-", substr(id, n+1, nchar(id)), sep = "")
-  # new_id
 }
 
 sat1$`Display ID` <- lapply(sat1$`Display ID`, reformat_id, n = 6)
@@ -131,23 +126,3 @@ sat$`Display ID` <- as.character(sat$`Display ID`)
 
 write_csv(sat, "sat.csv")
 ```
-
-
-## clean up captures dataset (this code is deprecated)
-```{r}
-captures <- read_csv("captures.csv")[-1]
-
-# rename imptnt cols
-colnames(captures)[2] <- "country"
-colnames(captures)[3] <- "country_code"
-colnames(captures)[4] <- "facility_name"
-colnames(captures)[5] <- "coordinates"
-colnames(captures)[7] <- "lat"
-colnames(captures)[8] <- "lng"
-
-captures$start_date[captures$start_date == -99] <- NA # replace -99 (unknown start dates) with NA
-captures$start_date <- as.Date(paste(captures$start_date, "-01-01 00:00:00", sep = "")) # convert start date to Date object
-
-write.csv(captures, "captures.csv")
-```
-
