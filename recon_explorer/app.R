@@ -347,9 +347,9 @@ server <- function(input, output, session) {
         cap_table,
         options = list(
           lengthMenu = c(5, 10, 15), # set the options for the number of entries per page
-          pageLength = 5, # set the default number of entries per page),
-          selection = "none" # disable selecting rows to get rid of annoying blue selection
-        ),
+          pageLength = 5 # set the default number of entries per page)
+        ), 
+        selection = "none", # disable selecting rows to get rid of annoying blue selection
         escape = FALSE)
       })
   }
