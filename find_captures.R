@@ -33,6 +33,7 @@ fac_captures <- st_join(x = facs_sf, y = sat_sf, join = st_within)
 fac_captures$geometry <- st_as_text(fac_captures$geometry)
 fac_captures$polygon_geometry <- st_as_text(fac_captures$polygon_geometry)
 
+# add URLs for the satellite photos
 fac_captures <- fac_captures %>%
   mutate(pic_URL = ifelse(`Data Source` == "declass1",
                           paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839febdccb64b3/", 
@@ -80,6 +81,21 @@ miss_captures <- miss_captures %>%
   filter(start_date <= `Acquisition Date`,
          ifelse(!is.na(end_date), end_date >= `Acquisition Date`, TRUE)) %>%
   as.data.frame() # convert from SF back to regular DF
+
+# add URLs for the satellite photos
+miss_captures <- miss_captures %>%
+  mutate(pic_URL = ifelse(`Data Source` == "declass1",
+                          paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839febdccb64b3/", 
+                                `Display ID`, sep = ""),
+                          ifelse(`Data Source` == "declass2",
+                                 paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e839ff7d71d4811/",
+                                       `Display ID`, sep = ""),
+                                 ifelse(`Data Source` == "declass3",
+                                        paste("https://earthexplorer.usgs.gov/scene/metadata/full/5e7c41f3ffaaf662/",
+                                              `Display ID`, sep = ""),
+                                        "No URL available.")
+                          )
+  ))
 
 # miss_captures$`Display ID` <- as.character(miss_captures$`Display ID`) # this should be unec.
 
