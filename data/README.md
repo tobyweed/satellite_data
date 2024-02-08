@@ -1,6 +1,10 @@
 # Satellite Recon Data
 
-Datasets on US satellite surveillance of nuclear activity from 1941-1985. The satellite imagery datasets are from downloaded from [USGS Earth Explorer](https://earthexplorer.usgs.gov/). There are also datasets of nuclear facilities and missile sites, along with metadata, which were hand-collated by Quido Haskovec.
+Datasets on US satellite surveillance of nuclear activity from 1941-1985. The satellite imagery datasets were from downloaded from [USGS Earth Explorer](https://earthexplorer.usgs.gov/). 
+
+There are also datasets of nuclear facilities (`facilities.csv`) and missile sites (`missiles.csv`), along with metadata. These were gathered by Quido Haskovec. The document `CoronaProject_Sources.docx` contains information on the methods used to gather these datasets; note that the provided coordinated are of highly limited precision.
+
+The "captures" datasets (`fac_caps_no_unknown.csv`, `fac_caps_with_unknown.csv`, `miss_captures.csv`) were obtained by taking the geographic intersection of the `facilities` and `missiles` coordinates with those of the satellite images. Since the source coordinates are imprecise and much of the imagery is low-definition, low-quality, or cloud-covered, these only represent *candidate* captures, not cases where nuclear targets are actually visible.
 
 ## Datasets:
 1. `sat.csv` contains various metadata (including geometries) for every satellite image in the dataset. It is a concatenation of `sat1.csv`, `sat2.csv`, and `sat3.csv`, along with various conflict resolutions & some minor cleaning.

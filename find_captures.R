@@ -15,7 +15,7 @@ library(sf)
 
 facs <- read_csv("data/facilities.csv")[-1] # facility coordinates
 missiles <- read_csv("data/missiles.csv")[-1] # missile coordinates
-sat <- read_csv("data/sat.csv")[-1] # satellite photo polygons
+sat <- read_csv("data/sat.csv") # satellite photo polygons
 
 # create Simple Features DFs
 facs_sf <- st_as_sf(facs, coords = c("lng", "lat"), remove = FALSE)
@@ -100,4 +100,45 @@ miss_captures <- miss_captures %>%
 # miss_captures$`Display ID` <- as.character(miss_captures$`Display ID`) # this should be unec.
 
 write.csv(miss_captures, "data/miss_captures.csv")
+
+
+
+
+# ------------------ Add Capture Timeline to Targets Datasets ---------------- ##
+# add the date when each target was first captured in low and high resolution to facs and missiles datasets
+earliest_caps <- fac_caps_with_unknown %>%
+  group_by(facility_name, `Camera Resolution (General)`) %>% # group by facility, camera res
+  filter(`Acquisition Date` == min(`Acquisition Date`)) %>% # keep the most recent fac_caps
+  distinct(facility_name, .keep_all = TRUE) # make sure only one capture of each facility is present.
+
+facs$cap_date_low_res <- as.Date("0000-01-01") # placeholder dates
+facs$cap_date_high_res <- as.Date("0000-01-01") # placeholder dates
+
+# loop through the facilities and find the earliest capture dates for both high and low res
+for (i in 1:nrow(facs)) {
+  fac <- facs$facility_name[i]
+  
+  # find the first high-res capture for facility i and record the date
+  relevant_row_high <- earliest_caps %>% filter(facility_name == fac,
+                                                `Camera Resolution (General)` == "High")
+  
+  high_res_date <- ifelse(nrow(relevant_row_high) > 0,
+                          as.Date(relevant_row_high$`Acquisition Date`),
+                          NA)
+  
+  facs$cap_date_high_res[i] <- as.Date(high_res_date)
+  
+  
+  # find the first low-res capture for facility i and record the date
+  relevant_row_low <- earliest_caps %>% filter(facility_name == fac,
+                                               `Camera Resolution (General)` == "Low")
+  
+  low_res_date <- ifelse(nrow(relevant_row_low) > 0,
+                         as.Date(relevant_row_low$`Acquisition Date`),
+                         NA)
+  
+  facs$cap_date_low_res[i] <- as.Date(low_res_date)
+}
+
+write.csv(facs, "data/facilities.csv")
 

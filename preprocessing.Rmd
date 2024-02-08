@@ -35,7 +35,7 @@ facs <- facs %>%
 
 facs <- facs[, c("facility_name", "country", "country_code", "coordinates", "lat", "lng", "start_date")] # reorder columns
 
-write.csv(facs, "facilities.csv")
+write.csv(facs, "data/facilities.csv")
 ```
 
 ## clean up missiles dataset
@@ -61,16 +61,16 @@ missiles <- missiles %>%
 
 missiles <- missiles[, c("address_found", "country", "coordinates", "lat", "lng", "start_date", "end_date", "address","No.rd.", "W.h","armament","RA_or_enclosure")] # reorder columns
 
-write.csv(missiles, "missiles.csv")
+write.csv(missiles, "data/missiles.csv")
 ```
 
 
 ## clean up and integrate sat datasets
 ```{r}
 # need to clean up coords n shit
-sat1 <- read_csv("sat1.csv")
-sat2 <- read_csv("sat2.csv")
-sat3 <- read_csv("sat3.csv")
+sat1 <- read_csv("data/sat1.csv")
+sat2 <- read_csv("data/sat2.csv")
+sat3 <- read_csv("data/sat3.csv")
 
 # fix column inconsistencies
 setdiff(colnames(sat2), colnames(sat1))
@@ -122,7 +122,11 @@ sat <- sat %>%
 
 sat <- sat[, -c(13:32)]
 
+# interpret display ID a character string rather than a number
 sat$`Display ID` <- as.character(sat$`Display ID`)
 
-write_csv(sat, "sat.csv")
+# define a more general camera resolution parameter
+sat <- sat %>% mutate(`Camera Resolution (General)` = ifelse(`Camera Resolution` %in% c("Stereo High", "Vertical High", "2 to 4 feet"), "High", "Low"))
+
+write_csv(sat, "data/sat.csv")
 ```
